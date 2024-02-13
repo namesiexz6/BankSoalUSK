@@ -1,0 +1,28 @@
+@extends('navbar')
+
+@section('body')
+
+
+<div class="card my-5">
+    <div class="card-body">
+        <div class="container">
+            <h3 class="card-title">Upload Soal</h3>
+            <hr>
+            <form action="{{ route('register')}}" method="post" enctype="multipart/form-data">
+            @csrf
+                <label for="nama" class="form-label mt-3">Name:</label>
+                <input class="form-control" name="nama" id="nama" type="text"  aria-label="default input">
+
+                <label for="username" class="form-label mt-3">Username:</label>
+                <input class="form-control" name="username" id="username" type="text" placeholder="ex : Latihan 1" aria-label="default input">
+
+                <label for="password" class="form-label  mt-3">Password:</label>
+                <input class="form-control" type="text" name="password" id="password">
+
+                <button type="submit" class="btn btn-info text-light mt-3">submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+@endsection
