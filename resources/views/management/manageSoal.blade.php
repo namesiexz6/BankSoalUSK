@@ -4,6 +4,7 @@
 <head>
 
     <link rel="stylesheet" href="/css/popupform.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.1.1/tinymce.min.js" integrity="sha512-bAtLCmEwg+N9nr6iVELr/SlDxBlyoF0iVdPxAvcOCfUiyi6RcuS6Lzawi78iPbAfbNyIUftvwK9HPWd+3p975Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <div style="margin-left:15%">
@@ -13,111 +14,73 @@
 
     <div class="w3-container">
         <div class="container">
-            <div class="row">
-                <div class="col-md-3">
-                    <form action="{{ route('cariJenjangM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
+            <form action="{{ route('cariMatakuliahM') }}" method="post" id="matakuliahForm">
+                @csrf
+                <div class="row">
+
+                    <div class="col-md-3">
+
                         <label for="jenjang" class="form-label mt-3">Pilih Jenjang:</label>
-                        <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_jenjang') }}"> {{session('jenjang')}}</option>
+                        <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang">
+
+                            <option value="">-- Pilih Jenjang --</option>
                             @foreach ($jenjang as $jj)
-                            <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
+                            <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>{{ $jj->nama }}</option>
                             @endforeach
                         </select>
-                    </form>
-                </div>
-                <div class="col-md-3">
-                    <form action="{{ route('cariFakultasM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
+
+
+                    </div>
+                    <div class="col-md-3">
                         <label for="fakultas" class="form-label mt-3">Pilih Fakultas:</label>
-                        @if(session('id_jenjang'))
-                        <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_fakultas') }}"> {{session('fakultas')}}</option>
+                        <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" {{ !session('jenjang') ? 'disabled' : '' }}>
+                            <option value="">-- Pilih Fakultas --</option>
                             @foreach ($fakultas as $f)
-                            @if($f->id_jenjang == session('id_jenjang'))
-                            <option value="{{ $f->id }}">{{ $f->nama }}</option>
-                            @endif
+                            <option value="{{ $f->id }}" {{ session('fakultas') == $f->id ? 'selected' : '' }}>{{ $f->nama }}</option>
                             @endforeach
                         </select>
-                        @else
-                        <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" disabled>
-                            <option selected>---</option>
-                        </select>
-                        @endif
-                    </form>
-                </div>
-                <div class="col-md-3">
-                    <form action="{{ route('cariProdiM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
+                    </div>
+                    <div class="col-md-3">
                         <label for="prodi" class="form-label mt-3">Pilih Prodi:</label>
-                        @if(session('id_fakultas'))
-                        <select class="form-select" aria-label="Default select" name="prodi" id="prodi" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_prodi') }}"> {{session('prodi')}}</option>
+                        <select class="form-select" aria-label="Default select" name="prodi" id="prodi" {{ !session('fakultas') ? 'disabled' : '' }}>
+                            <option value="">-- Pilih Prodi --</option>
                             @foreach ($prodi as $p)
-                            @if($p->id_fakultas == session('id_fakultas'))
-                            <option value="{{ $p->id }}">{{ $p->nama }}</option>
-                            @endif
+                            <option value="{{ $p->id }}" {{ session('prodi') == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
                             @endforeach
                         </select>
-                        @else
-                        <select class="form-select" aria-label="Default select" name="prodi" id="prodi" disabled>
-                            <option selected>---</option>
-                        </select>
-                        @endif
-                    </form>
-                </div>
-                <div class="col-md-3">
-                    <form action="{{ route('cariSemesterM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
+                    </div>
+                    <div class="col-md-3">
                         <label for="semester" class="form-label mt-3">Pilih Semester:</label>
-                        @if(session('id_prodi') )
-                        <select class="form-select" aria-label="Default select" name="semester" id="semester" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_semester') }}"> {{session('semester')}}</option>
+                        <select class="form-select" aria-label="Default select" name="semester" id="semester" {{ !session('prodi') ? 'disabled' : '' }}>
+                            <option value="">-- Pilih Semester --</option>
                             @foreach ($semester as $s)
-                            @if($s->id_prodi == session('id_prodi'))
-                            <option value="{{ $s->id }}">{{ $s->nama }}</option>
-                            @endif
+                            <option value="{{ $s->id }}" {{ session('semester') == $s->id ? 'selected' : '' }}>{{ $s->nama }}</option>
                             @endforeach
                         </select>
-                        @else
-                        <select class="form-select" aria-label="Default select" name="semester" id="semester" disabled>
-                            <option selected>---</option>
-                        </select>
-                        @endif
-                    </form>
-                </div>
-                <div class="col-md-3">
-                    <form action="{{ route('cariMatakuliahM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
+                    </div>
+                    <div class="col-md-3">
                         <label for="matakuliah" class="form-label mt-3">Pilih Matakuliah:</label>
-                        @if(session('id_semester') )
-                        <select class="form-select" aria-label="Default select" name="matakuliah" id="matakuliah" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_matakuliah') }}"> {{session('matakuliah')}}</option>
+                        <select class="form-select" aria-label="Default select" name="matakuliah" id="matakuliah" {{ !session('prodi') ? 'disabled' : '' }}>
+                            <option value="">-- Pilih Matakuliah --</option>
                             @foreach ($matakuliah as $m)
-                            @if($m->id_semester == session('id_semester'))
-                            <option value="{{ $m->id }}">{{ $m->nama }}</option>
-                            @endif
+                            <option value="{{ $m->id }}" {{ session('matakuliah') == $m->id ? 'selected' : '' }}>{{ $m->nama }}</option>
                             @endforeach
                         </select>
-                        @else
-                        <select class="form-select" aria-label="Default select" name="matakuliah" id="matakuliah" disabled>
-                            <option selected>---</option>
-                        </select>
-                        @endif
-                    </form>
+                    </div>
+
                 </div>
-            </div>
+            </form>
         </div>
     </div>
     <div style="margin-left:10px; margin-right:10px;">
-        @if(session('id_matakuliah')!= 0)
+        @if(session('matakuliah')!= 0)
 
         <h2 class="mt-5">Daftar Soal</h2>
         <table class="table table-bordered table-light table-striped my-3">
             <thead class="table-dark">
                 <input type="hidden" name="id_semester" value="1">
                 <tr>
-                    <th colspan="5">Mata Kuliah {{session('matakuliah')}}</th>
+                    <th colspan="5">Mata Kuliah {{session('matakuliah_nama')}}</th>
                 </tr>
                 <tr>
                     <th scope="col">No</th>
@@ -158,8 +121,10 @@
 
 
         @endif
+        <button class="buttonadd mt-3" type="button" onclick="window.location.href='/addSoal'">Tambah soal</button>
 
-        <button class="buttonadd mt-3" type="button" id="adressBTN" onclick="openRegisterForm()">Tambah Soal</button>
+
+    <!-- <button class="buttonadd mt-3" type="button" id="adressBTN" onclick="openRegisterForm()">Tambah Soal</button>-->
     </div>
 
     <div id="registerForm" class="register-form">
@@ -171,8 +136,19 @@
             <label class="form-label mt-3">Nama Soal:</label>
             <input class="form-control" name="nama_soal" id="nama_soal" type="text" placeholder="ex : Latihan 1" required>
 
-            <label for="formFile" class="form-label  mt-3">Pilih File:</label>
-            <input class="form-control" type="file" name="formFile" id="formFile" required>
+            <div id="fileOptions" class="tab">
+                <button class="tablinks active" onclick="toggleFileOption(event, 'upload')">Upload File</button>
+                <button class="tablinks" onclick="toggleFileOption(event, 'textarea')">Textarea</button>
+            </div>
+
+            <!-- input file และ textarea -->
+            <div id="upload" class="tabcontent" style="display: block;">
+                <label class="form-label mt-3">Pilih File:</label>
+                <input class="form-control" type="file" name="formFile" id="formFile">
+            </div>
+            <div id="textarea" class="tabcontent" style="display: none;">
+                <textarea class="form-control" id="textareaContent" name="textareaContent"></textarea>
+            </div>
             <label for="jenjang2" class="form-label  mt-3">Pilih alamat:</label> <br>
             <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2">
                 <option value="">-- Pilih Janjang --</option>
@@ -210,9 +186,10 @@
     </div>
     <div id="registerFormEdit" class="register-form">
 
-        <form action="{{ route('editSoalM') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('soalM') }}" method="post" enctype="multipart/form-data">
 
             @csrf
+            <input type="hidden" name="edit" value="1">
             <h1>Edit Soal</h1>
             <label class="form-label mt-3">Nama Soal:</label>
             <input type="hidden" name="soal_id" id="soal_id" value="">
@@ -261,6 +238,157 @@
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        let jenjang = $('#jenjang');
+        let fakultas = $('#fakultas');
+        let prodi = $('#prodi');
+        let semester = $('#semester');
+        let matakuliah = $('#matakuliah');
+        let matakuliahForm = $('#matakuliahForm');
+        let csrfToken = '{{ csrf_token() }}';
+
+        jenjang.change(function() {
+            let idJenjang = this.value;
+            if (idJenjang) {
+                fakultas.prop('disabled', false);
+                $.ajax({
+                    url: "{{ route('cariFakultasM2') }}",
+                    type: "POST",
+                    data: {
+                        id_jenjang: idJenjang,
+                        _token: csrfToken
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        fakultas.empty().append('<option value="">-- Pilih Fakultas --</option>');
+                        $.each(result.fakultas, function(key, value) {
+                            fakultas.append('<option value="' + value.id + '">' + value.nama + '</option>');
+                        });
+                        prodi.prop('disabled', true);
+                        semester.prop('disabled', true);
+                        matakuliah.prop('disabled', true);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            } else {
+                fakultas.prop('disabled', true);
+                prodi.prop('disabled', true);
+                semester.prop('disabled', true);
+                matakuliah.prop('disabled', true);
+            }
+        });
+
+        fakultas.change(function() {
+            let idFakultas = this.value;
+            if (idFakultas) {
+                prodi.prop('disabled', false);
+                $.ajax({
+                    url: "{{ route('cariProdiM2') }}",
+                    type: "POST",
+                    data: {
+                        id_fakultas: idFakultas,
+                        _token: csrfToken
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        prodi.empty().append('<option value="">-- Pilih Prodi --</option>');
+                        $.each(result.prodi, function(key, value) {
+                            prodi.append('<option value="' + value.id + '">' + value.nama + '</option>');
+                        });
+                        semester.prop('disabled', true);
+                        matakuliah.prop('disabled', true);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            } else {
+                prodi.prop('disabled', true);
+                semester.prop('disabled', true);
+                matakuliah.prop('disabled', true);
+            }
+        });
+
+        prodi.change(function() {
+            let idProdi = this.value;
+            if (idProdi) {
+                semester.prop('disabled', false);
+                $.ajax({
+                    url: "{{ route('cariSemesterM2') }}",
+                    type: "POST",
+                    data: {
+                        id_prodi: idProdi,
+                        _token: csrfToken
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        semester.empty().append('<option value="">-- Pilih Semester --</option>');
+                        $.each(result.semester, function(key, value) {
+                            semester.append('<option value="' + value.id + '">' + value.nama + '</option>');
+                        });
+                        matakuliah.prop('disabled', true);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            } else {
+                semester.prop('disabled', true);
+                matakuliah.prop('disabled', true);
+            }
+        });
+
+        semester.change(function() {
+            let idSemester = this.value;
+            if (idSemester) {
+                matakuliah.prop('disabled', false);
+                $.ajax({
+                    url: "{{ route('cariMatakuliahM2') }}",
+                    type: "POST",
+                    data: {
+                        id_semester: idSemester,
+                        _token: csrfToken
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        matakuliah.empty().append('<option value="">-- Pilih Matakuliah --</option>');
+                        $.each(result.matakuliah, function(key, value) {
+                            matakuliah.append('<option value="' + value.id + '">' + value.nama + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            } else {
+                matakuliah.prop('disabled', true);
+            }
+        });
+
+
+        matakuliah.change(function() {
+            matakuliahForm.submit();
+        });
+    });
+</script>
+<script>
+    function toggleFileOption(evt, optionName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(optionName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+</script>
 <script>
     function openRegisterForm() {
         document.getElementById("registerForm").style.display = "block";
@@ -394,10 +522,9 @@
                 }
             });
         });
-       
-        
-});
 
+
+    });
 </script>
 <script>
     $(document).ready(function() {
@@ -492,9 +619,54 @@
                 }
             });
         });
-       
-        
-});
 
+
+    });
 </script>
+
+   <script>
+        tinymce.init({
+            selector: '#textareaContent',
+            promotion: false,
+            plugins: 'preview importcss searchreplace autolink directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
+            editimage_cors_hosts: ['picsum.photos'],
+            menubar: 'file edit view insert format tools table help',
+            toolbar: "undo redo | accordion accordionremove | blocks fontfamily fontsize | bold italic underline strikethrough | align numlist bullist | link image | table media | lineheight outdent indent| forecolor backcolor removeformat | charmap emoticons | code fullscreen preview | print | pagebreak anchor codesample | ltr rtl",
+            image_advtab: true,
+            file_picker_callback: function(callback, value, meta) {
+                if (meta.filetype === 'file' || meta.filetype === 'media') {
+                    var input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', '*');
+                    input.onchange = function() {
+                        var file = this.files[0];
+                        callback(URL.createObjectURL(file), {
+                            text: file.name
+                        });
+                    };
+                    input.click();
+                } else if (meta.filetype === 'image') {
+                    var input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/*');
+                    input.onchange = function() {
+                        var file = this.files[0];
+                        callback(URL.createObjectURL(file), {
+                            alt: file.name
+                        });
+                    };
+                    input.click();
+                }
+            },
+            height: '297mm',
+            image_caption: true,
+            quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+            noneditable_class: 'mceNonEditable',
+            toolbar_mode: 'sliding',
+            contextmenu: 'link image table',
+            skin: 'oxide',
+            content_css: 'default',
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+        });
+    </script>
 @endsection

@@ -14,52 +14,45 @@
 
     <div class="w3-container">
         <div class="container">
-            <div class="row">
-                <div class="col-md-3">
-                    <form action="{{ route('cariJenjangM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
-                        <label for="jenjang" class="form-label mt-3">Pilih Jenjang:</label>
-                        <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_jenjang') }}"> {{session('jenjang')}}</option>
-                            @foreach ($jenjang as $jj)
-                            <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
-                            @endforeach
-                        </select>
-                    </form>
-                </div>
-                <div class="col-md-3">
-                    <form action="{{ route('cariFakultasM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
-                        <label for="fakultas" class="form-label mt-3">Pilih Fakultas:</label>
-                        @if(session('id_jenjang'))
-                        <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_fakultas') }}"> {{session('fakultas')}}</option>
-                            @foreach ($fakultas as $f)
-                            @if($f->id_jenjang == session('id_jenjang'))
-                            <option value="{{ $f->id }}">{{ $f->nama }}</option>
-                            @endif
-                            @endforeach
-                        </select>
-                        @else
-                        <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" disabled>
-                            <option selected>---</option>
-                        </select>
-                        @endif
-                    </form>
-                </div>
+        <form action="{{ route('cariFakultasM') }}" method="post" id="fakultasForm">
+                @csrf
+                <div class="row">
 
-            </div>
+                    <div class="col-md-3">
+
+                        <label for="jenjang" class="form-label mt-3">Pilih Jenjang:</label>
+                        <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang">
+
+                            <option value="">-- Pilih Jenjang --</option>
+                            @foreach ($jenjang as $jj)
+                            <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>{{ $jj->nama }}</option>
+                            @endforeach
+                        </select>
+
+
+                    </div>
+                    <div class="col-md-3">
+                        <label for="fakultas" class="form-label mt-3">Pilih Fakultas:</label>
+                        <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" {{ !session('jenjang') ? 'disabled' : '' }}>
+                            <option value="">-- Pilih Fakultas --</option>
+                            @foreach ($fakultas as $f)
+                            <option value="{{ $f->id }}" {{ session('fakultas') == $f->id ? 'selected' : '' }}>{{ $f->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     <div style="margin-left:10px; margin-right:10px;">
-        @if(session('id_fakultas')!= 0)
+        @if(session('fakultas')!= 0)
 
-        <h2 class="mt-5">Daftar Soal</h2>
+        <h2 class="mt-5">Daftar Prodi</h2>
         <table class="table table-bordered table-light table-striped my-3">
             <thead class="table-dark">
                 <input type="hidden" name="id_fakultas" value="1">
                 <tr>
-                    <th colspan="5">Fakultas {{session('fakultas')}}</th>
+                    <th colspan="5">Fakultas {{session('fakultas_nama')}}</th>
                 </tr>
                 <tr>
                     <th scope="col">No</th>
@@ -107,13 +100,13 @@
             <label class="form-label mt-3">Nama Prodi:</label>
             <input class="form-control" name="nama_prodi" id="nama_prodi" type="text" placeholder="Informatika" required>
             <label class="form-label mt-3">Pilih alamat</label><br>
-            <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2">
+            <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2" >
                 <option value="">-- Pilih Janjang --</option>
                 @foreach ($jenjang as $jj)
                 <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
                 @endforeach
             </select>
-            <select class="form-control" aria-label="Default select" name="fakultas2" id="fakultas2">
+            <select class="form-control" aria-label="Default select" name="fakultas2" id="fakultas2" required>
                 <option value="">-- Pilih Fakultas --</option>
                 @foreach ($fakultas as $f)
                 <option value="{{ $f->id }}">{{ $f->nama }}</option>
@@ -127,10 +120,11 @@
     
     <div id="registerFormEdit" class="register-form">
 
-        <form action="{{ route('editProdiM') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('prodiM') }}" method="post" enctype="multipart/form-data">
 
             @csrf
             <h1>Edit Prodi</h1>
+            <input type="hidden" name="edit" value="1">
             <label class="form-label mt-3">Nama Prodi:</label>
             <input type="hidden" name="prodi_id" id="prodi_id" value="">
             <input class="form-control" name="nama_prodi" id="nama_prodi" type="text" value="" required>
@@ -141,7 +135,7 @@
                 <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
                 @endforeach
             </select>
-            <select class="form-control" aria-label="Default select" name="fakultas2" id="fakultas3">
+            <select class="form-control" aria-label="Default select" name="fakultas2" id="fakultas3" required>
                 <option value="">-- Pilih Fakultas --</option>
                 @foreach ($fakultas as $f)
                 <option value="{{ $f->id }}">{{ $f->nama }}</option>
@@ -158,6 +152,50 @@
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        let jenjang = $('#jenjang');
+        let fakultas = $('#fakultas');;
+        let fakultasForm = $('#fakultasForm');
+        let csrfToken = '{{ csrf_token() }}';
+
+        jenjang.change(function() {
+            let idJenjang = this.value;
+            if (idJenjang) {
+                fakultas.prop('disabled', false);
+                $.ajax({
+                    url: "{{ route('cariFakultasM2') }}",
+                    type: "POST",
+                    data: {
+                        id_jenjang: idJenjang,
+                        _token: csrfToken
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        fakultas.empty().append('<option value="">-- Pilih Fakultas --</option>');
+                        $.each(result.fakultas, function(key, value) {
+                            fakultas.append('<option value="' + value.id + '">' + value.nama + '</option>');
+                        });
+                     
+                        
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            } else {
+                fakultas.prop('disabled', true);
+               
+                
+            }
+        });
+
+        fakultas.change(function() {
+            fakultasForm.submit();
+        });
+    });
+</script>
 <script>
     function openRegisterForm() {
         document.getElementById("registerForm").style.display = "block";

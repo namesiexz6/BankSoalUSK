@@ -13,32 +13,37 @@
 
     <div class="w3-container">
         <div class="container">
-            <div class="row">
-                <div class="col-md-3">
-                    <form action="{{ route('cariJenjangM') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ route('cariJenjangM') }}" method="post" enctype="multipart/form-data">
+
+                <div class="row">
+                    <div class="col-md-3">
+
                         @csrf
                         <label for="jenjang" class="form-label mt-3">Pilih Jenjang:</label>
                         <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_jenjang') }}"> {{session('jenjang')}}</option>
+                            <option hidden disabled selected value="{{ session('jenjang') }}">
+                                {{session('jenjang_nama')}}
+                            </option>
                             @foreach ($jenjang as $jj)
                             <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
                             @endforeach
                         </select>
-                    </form>
-                </div>
 
-            </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
-    @if(session('id_jenjang')!= 0)
+
     <div style="margin-left:10px; margin-right:10px;">
+    @if(session('jenjang') != 0)
         <h2 class="mt-5">Daftar Soal</h2>
         <table class="table table-bordered table-light table-striped my-3">
             <thead class="table-dark">
                 <input type="hidden" name="id_fakultas" value="1">
                 <tr>
-                    <th colspan="5">Janjang {{session('jenjang')}}</th>
+                    <th colspan="5">Janjang {{session('jenjang_nama')}}</th>
                 </tr>
                 <tr>
                     <th scope="col">No</th>
@@ -85,7 +90,7 @@
             <label class="form-label mt-3">Nama Fakultas:</label>
             <input class="form-control" name="nama_fakultas" id="nama_fakultas" type="text" placeholder="MIPA" required>
 
-            <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2">
+            <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2" required>
                 <option value="">{{-- Pilih Janjang --}}</option>
                 @foreach ($jenjang as $jj)
                 <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
@@ -99,15 +104,16 @@
     </div>
     <div id="registerFormEdit" class="register-form">
 
-        <form action="{{ route('editFakultasM') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('fakultasM') }}" method="post" enctype="multipart/form-data">
 
             @csrf
             <h1>Edit Fakultas</h1>
+            <input type="hidden" name="edit" value="1">
             <label class="form-label mt-3">Nama Fakultas:</label>
             <input type="hidden" name="fakultas_id" id="fakultas_id" value="">
             <input class="form-control" name="nama_fakultas" id="nama_fakultas" type="text" value="" required>
 
-            <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2">
+            <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2" required>
                 <option value="">-- Pilih Janjang --</option>
                 @foreach ($jenjang as $jj)
                 <option value="{{ $jj->id }}">{{ $jj->nama }}</option>

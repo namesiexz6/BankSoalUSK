@@ -13,71 +13,54 @@
 
     <div class="w3-container">
         <div class="container">
-            <div class="row">
-                <div class="col-md-3">
-                    <form action="{{ route('cariJenjangM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
+            <form action="{{ route('cariProdiM') }}" method="post" id="prodiForm">
+                @csrf
+                <div class="row">
+
+                    <div class="col-md-3">
+
                         <label for="jenjang" class="form-label mt-3">Pilih Jenjang:</label>
-                        <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_jenjang') }}"> {{session('jenjang')}}</option>
+                        <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang">
+
+                            <option value="">-- Pilih Jenjang --</option>
                             @foreach ($jenjang as $jj)
-                            <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
+                            <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>{{ $jj->nama }}</option>
                             @endforeach
                         </select>
-                    </form>
-                </div>
-                <div class="col-md-3">
-                    <form action="{{ route('cariFakultasM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
+
+
+                    </div>
+                    <div class="col-md-3">
                         <label for="fakultas" class="form-label mt-3">Pilih Fakultas:</label>
-                        @if(session('id_jenjang'))
-                        <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_fakultas') }}"> {{session('fakultas')}}</option>
+                        <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" {{ !session('jenjang') ? 'disabled' : '' }}>
+                            <option value="">-- Pilih Fakultas --</option>
                             @foreach ($fakultas as $f)
-                            @if($f->id_jenjang == session('id_jenjang'))
-                            <option value="{{ $f->id }}">{{ $f->nama }}</option>
-                            @endif
+                            <option value="{{ $f->id }}" {{ session('fakultas') == $f->id ? 'selected' : '' }}>{{ $f->nama }}</option>
                             @endforeach
                         </select>
-                        @else
-                        <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" disabled>
-                            <option selected>---</option>
-                        </select>
-                        @endif
-                    </form>
-                </div>
-                <div class="col-md-3">
-                    <form action="{{ route('cariProdiM') }}" method="post" enctype="multipart/form-data">
-                        @csrf
+                    </div>
+                    <div class="col-md-3">
                         <label for="prodi" class="form-label mt-3">Pilih Prodi:</label>
-                        @if(session('id_fakultas'))
-                        <select class="form-select" aria-label="Default select" name="prodi" id="prodi" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('id_prodi') }}"> {{session('prodi')}}</option>
+                        <select class="form-select" aria-label="Default select" name="prodi" id="prodi" {{ !session('fakultas') ? 'disabled' : '' }}>
+                            <option value="">-- Pilih Prodi --</option>
                             @foreach ($prodi as $p)
-                            @if($p->id_fakultas == session('id_fakultas'))
-                            <option value="{{ $p->id }}">{{ $p->nama }}</option>
-                            @endif
+                            <option value="{{ $p->id }}" {{ session('prodi') == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
                             @endforeach
                         </select>
-                        @else
-                        <select class="form-select" aria-label="Default select" name="prodi" id="prodi" disabled>
-                            <option selected>---</option>
-                        </select>
-                        @endif
-                    </form>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
     <div style="margin-left:10px; margin-right:10px;">
-        @if(session('id_prodi')!= 0)
+        @if(session('prodi')!= 0)
 
         <h2 class="mt-5">Daftar Soal</h2>
         <table class="table table-bordered table-light table-striped my-3">
             <thead class="table-dark">
                 <input type="hidden" name="id_prodi" value="1">
                 <tr>
-                    <th colspan="5">Prodi {{session('Prodi')}}</th>
+                    <th colspan="5">Prodi {{session('Prodi_nama')}}</th>
                 </tr>
                 <tr>
                     <th scope="col">No</th>
@@ -136,7 +119,7 @@
                 <option value="{{ $f->id }}">{{ $f->nama }}</option>
                 @endforeach
             </select>
-            <select class="form-control" aria-label="Default select" name="prodi2" id="prodi2">
+            <select class="form-control" aria-label="Default select" name="prodi2" id="prodi2" required>
                 <option value="">-- Pilih Prodi --</option>
                 @foreach ($prodi as $p)
                 <option value="{{ $p->id }}">{{ $p->nama }}</option>
@@ -149,9 +132,10 @@
 
     <div id="registerFormEdit" class="register-form">
 
-        <form action="{{ route('editSemesterM') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('semesterM') }}" method="post" enctype="multipart/form-data">
 
             @csrf
+            <input type="hidden" name="edit" value="1">
             <h1>Edit Semester</h1>
             <label class="form-label mt-3">Nama Semester:</label>
             <input type="hidden" name="semester_id" id="semester_id" value="">
@@ -169,7 +153,7 @@
                 <option value="{{ $f->id }}">{{ $f->nama }}</option>
                 @endforeach
             </select>
-            <select class="form-control" aria-label="Default select" name="prodi2" id="prodi3">
+            <select class="form-control" aria-label="Default select" name="prodi2" id="prodi3" required>
                 <option value="">-- Pilih Prodi --</option>
                 @foreach ($prodi as $p)
                 <option value="{{ $p->id }}">{{ $p->nama }}</option>
@@ -186,6 +170,80 @@
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        let jenjang = $('#jenjang');
+        let fakultas = $('#fakultas');
+        let prodi = $('#prodi');
+        let prodiForm = $('#prodiForm');
+        let csrfToken = '{{ csrf_token() }}';
+
+        jenjang.change(function() {
+            let idJenjang = this.value;
+            if (idJenjang) {
+                fakultas.prop('disabled', false);
+                $.ajax({
+                    url: "{{ route('cariFakultasM2') }}",
+                    type: "POST",
+                    data: {
+                        id_jenjang: idJenjang,
+                        _token: csrfToken
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        fakultas.empty().append('<option value="">-- Pilih Fakultas --</option>');
+                        $.each(result.fakultas, function(key, value) {
+                            fakultas.append('<option value="' + value.id + '">' + value.nama + '</option>');
+                        });
+                        prodi.prop('disabled', true);
+                        
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            } else {
+                fakultas.prop('disabled', true);
+                prodi.prop('disabled', true);
+                
+            }
+        });
+
+        fakultas.change(function() {
+            let idFakultas = this.value;
+            if (idFakultas) {
+                prodi.prop('disabled', false);
+                $.ajax({
+                    url: "{{ route('cariProdiM2') }}",
+                    type: "POST",
+                    data: {
+                        id_fakultas: idFakultas,
+                        _token: csrfToken
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        prodi.empty().append('<option value="">-- Pilih Prodi --</option>');
+                        $.each(result.prodi, function(key, value) {
+                            prodi.append('<option value="' + value.id + '">' + value.nama + '</option>');
+                        });
+                        
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            } else {
+                prodi.prop('disabled', true);
+                
+            }
+        });
+
+
+        prodi.change(function() {
+            prodiForm.submit();
+        });
+    });
+</script>
 <script>
     function openRegisterForm() {
         document.getElementById("registerForm").style.display = "block";
@@ -272,7 +330,7 @@
                     $.each(result.prodi, function(key, value) {
                         prodi.innerHTML += '<option value="' + value.id + '">' + value.nama + '</option>';
                     });
-                   
+
                 }
             });
         });
@@ -323,7 +381,7 @@
                     $.each(result.prodi, function(key, value) {
                         prodi.innerHTML += '<option value="' + value.id + '">' + value.nama + '</option>';
                     });
-                   
+
                 }
             });
         });

@@ -72,10 +72,11 @@
     </div>
     <div id="registerFormEdit" class="register-form">
 
-        <form action="{{ route('editJenjangM') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('jenjangM') }}" method="post" enctype="multipart/form-data">
 
             @csrf
             <h1>Edit Janjang</h1>
+            <input type="hidden" name="edit" value="1">
             <label class="form-label mt-3">Nama Janjang:</label>
             <input type="hidden" name="jenjang_id" id="jenjang_id" value="">
             <input class="form-control" name="nama_jenjang" id="nama_jenjang" type="text" value="{{ $j->nama }}" required>

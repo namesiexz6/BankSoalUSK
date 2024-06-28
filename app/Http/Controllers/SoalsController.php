@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use HtmlToRtf\HtmlToRtf;
 
 class SoalsController extends Controller
 {
@@ -16,16 +17,34 @@ class SoalsController extends Controller
     public function addSoal(Request $request)
     {
         $isi_soal = $request->file("formFile");
-        $semester = $request->input("semester2");
+        $isi_soaltext = $request->input("textareaContent");
+
         $id_mk = $request->input("matakuliah2");
         $nama_soal = $request->input("nama_soal");
         $nama = auth()->user()->nama;
-        //dd(request()->all());
-
+   
         if (!$isi_soal) {
-            return redirect("/");
+            if (!$isi_soaltext) {
+                return redirect("/manageSoal");
+            }
+
+            if (!Storage::disk('public')->exists('html')) {
+                Storage::disk('public')->makeDirectory('html');
+            }
+            
+            $fileName = time() . '_' . $nama_soal . '_' . $nama . '.html';
+            Storage::disk('public')->put('html/' . $fileName, $isi_soaltext);
+
+
+            Soal::create([
+                'nama' => $nama,
+                'id_mk' => $id_mk,
+                'nama_soal' => $nama_soal,
+                'isi_soal' => $fileName
+            ]);
+            return redirect("/manageSoal");
         }
-        
+
         $fileName = time() . '_' . $isi_soal->getClientOriginalName();
         $isi_soal->storeAs('pdf', $fileName, 'public');
 
@@ -47,12 +66,11 @@ class SoalsController extends Controller
         $soal = Soal::where("id_mk", $id_mk)->orderBy("id", "asc")->get();
         $id = $request->input("edit");
 
-        
+
         session()->put("namamk", $mk->nama);
         session()->put("id_matakuliah", $id_mk);
 
         return view("soal", compact('soal'));
-
     }
 
     public function lihatsoal(Request $request)

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Session;
 
 class SearchSoalController extends Controller
 {
-    
+
     public function cariFakultas(Request $request)
     {
 
@@ -25,7 +25,7 @@ class SearchSoalController extends Controller
         $fakultas = Fakultas::all();
         $prodi = Prodi::all();
         $semester = Semester::all();
-        $matakuliah=Matakuliah::all();
+        $matakuliah = Matakuliah::all();
 
         session()->forget("id_prodi");
         session()->forget("id_semester");
@@ -46,7 +46,7 @@ class SearchSoalController extends Controller
         $fakultas = Fakultas::all();
         $prodi = Prodi::all();
         $semester = Semester::all();
-        $matakuliah=Matakuliah::all();
+        $matakuliah = Matakuliah::all();
 
         session()->forget("id_semester");
         session()->forget("semester");
@@ -55,26 +55,38 @@ class SearchSoalController extends Controller
     }
     public function cariSemester(Request $request)
     {
+        session()->forget("jenjang");
+        session()->forget("fakultas");
+        session()->forget("prodi");
+        session()->forget("semester");
+        session()->forget("matakuliah");
+        session()->forget("soal");
+        session()->forget("jenjang_nama");
+        session()->forget("fakultas_nama");
+        session()->forget("prodi_nama");
+        session()->forget("semester_nama");
+        session()->forget("matakuliah_nama");
+
         $id_semester = $request->input("semester");
-        $s = Semester::where("id", $id_semester)->orderBy("id", "asc")->firstOrFail();
-        session()->put("id_semester", $id_semester);
-        session()->put("semester", $s->nama);
+        $s = Semester::where("id", $id_semester)->firstOrFail();
+
+        session()->put("semester", $id_semester);
+        session()->put("semester_nama", $s->nama);
+        session()->put("jenjang", $request->input("jenjang"));
+        session()->put("fakultas", $request->input("fakultas"));
+        session()->put("prodi", $request->input("prodi"));
+        session()->put("semester", $id_semester);
 
         $jenjang = Jenjang::all();
         $fakultas = Fakultas::all();
         $prodi = Prodi::all();
         $semester = Semester::all();
-        $matakuliah = Matakuliah::where("id_semester", $id_semester)->orderBy("id", "asc")->get();
-        $sks = 0;
-
-        foreach ($matakuliah as $mkItem) {
-            $sks += $mkItem->sks;
-        }
-;
+        $matakuliah = Matakuliah::where("id_semester", $id_semester)->get();
+        $sks = $matakuliah->sum('sks');
 
         return view("semester", compact('jenjang', 'fakultas', 'prodi', 'semester', 'matakuliah', 'sks'));
     }
-   
+
 
     public function cariJenjang(Request $request)
     {
@@ -83,12 +95,12 @@ class SearchSoalController extends Controller
 
         $request->session()->put("id_jenjang", $id_jenjang);
         $request->session()->put("jenjang", $jj->nama);
-  
+
         $jenjang = Jenjang::all();
         $fakultas = Fakultas::all();
         $prodi = Prodi::all();
         $semester = Semester::all();
-        $matakuliah=Matakuliah::all();
+        $matakuliah = Matakuliah::all();
         session()->forget("id_fakultas");
         session()->forget("id_prodi");
         session()->forget("id_semester");
@@ -107,7 +119,7 @@ class SearchSoalController extends Controller
         $fakultas = Fakultas::all();
         $prodi = Prodi::all();
         $semester = Semester::all();
-        $matakuliah=Matakuliah::all();
+        $matakuliah = Matakuliah::all();
 
         return view("semester", compact('jenjang', 'fakultas', 'prodi', 'semester', 'matakuliah'));
     }

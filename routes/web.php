@@ -11,6 +11,13 @@ Route::get("/", function () {
     return view("homepage");
 });
 
+Route::get("/test", function () {
+    return view("test");
+});
+Route::get("/thread", function () {
+    return view("threadpage");
+});
+
 Route::get("/register", function () {
     return view("register");
 });
@@ -44,6 +51,7 @@ Route::post("/komentar", [SoalsController::class, 'komentar']);
     Route::get("/manageMatakuliah", [ManagementController::class, 'indexMm'])->name("tampilkanMatakuliahM");  
     Route::get("/manageSoal", [ManagementController::class, 'indexMs'])->name("tampilkanSoalM");
 
+
     Route::get("/management", [ManagementController::class, 'indexM'])->name("tampilkanM");
     Route::post("/management", [ManagementController::class, 'cariJenjangM'])->name("cariJenjangM");
     Route::post("/management1", [ManagementController::class, 'cariFakultasM'])->name("cariFakultasM"); 
@@ -57,14 +65,9 @@ Route::post("/komentar", [SoalsController::class, 'komentar']);
     Route::post("/managementadd4", [ManagementController::class, 'cariMatakuliahM2'])->name("cariMatakuliahM2");
 
 
-    Route::post("/manageJenjang", [ManagementController::class, 'jenjangM'])->name("jenjangM");
-    Route::post("/manageFakultas", [ManagementController::class, 'fakultasM'])->name("fakultasM");
-    Route::post("/manageProdi", [ManagementController::class, 'prodiM'])->name("prodiM");
-    Route::post("/manageSemester", [ManagementController::class, 'semesterM'])->name("semesterM");
-    Route::post("/manageMK", [ManagementController::class, 'matakuliahM'])->name("matakuliahM");
-    Route::post("/manageSoal", [ManagementController::class, 'soalM'])->name("soalM");
 
     //add data
+    Route::get("/addSoal", [ManagementController::class, 'indexMs2']);
     Route::post("/addSoal", [SoalsController::class, 'addSoal'])->name("tambahSoalM");
     Route::post("/addJenjang", [ManagementController::class, 'addJenjang'])->name("tambahJenjangM");
     Route::post("/addFakultas", [ManagementController::class, 'addFakultas'])->name("tambahFakultasM");
@@ -72,15 +75,14 @@ Route::post("/komentar", [SoalsController::class, 'komentar']);
     Route::post("/addSemester", [ManagementController::class, 'addSemester'])->name("tambahSemesterM");
     Route::post("/addMatakuliah", [ManagementController::class, 'addMatakuliah'])->name("tambahMatakuliahM");
 
-    //editdata
-    Route::post("/editJenjang", [ManagementController::class, 'indexMEj'])->name("editJenjangM");
-    Route::post("/editFakultas", [ManagementController::class, 'indexMEf'])->name("editFakultasM");
-    Route::post("/editProdi", [ManagementController::class, 'indexMEp'])->name("editProdiM");
-    Route::post("/editSemester", [ManagementController::class, 'indexMEsm'])->name("editSemesterM");
-    Route::post("/editMatakuliah", [ManagementController::class, 'indexMEm'])->name("editMatakuliahM");
-    Route::post("/editSoal", [ManagementController::class, 'indexMEs'])->name("editSoalM");
-    
 
+   //edit and delete data 
+    Route::post("/manageJenjang", [ManagementController::class, 'jenjangM'])->name("jenjangM");
+    Route::post("/manageFakultas", [ManagementController::class, 'fakultasM'])->name("fakultasM");
+    Route::post("/manageProdi", [ManagementController::class, 'prodiM'])->name("prodiM");
+    Route::post("/manageSemester", [ManagementController::class, 'semesterM'])->name("semesterM");
+    Route::post("/manageMK", [ManagementController::class, 'matakuliahM'])->name("matakuliahM");
+    Route::post("/manageSoal", [ManagementController::class, 'soalM'])->name("soalM");
 
 });
 
