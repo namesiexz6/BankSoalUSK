@@ -39,6 +39,7 @@
 
                         @csrf
                         <h1>Tambah Mata kuliah</h1>
+
                         <label class="form-label mt-3">Nama Soal:</label><br>
                         <input class="form-control" name="nama_soal" id="nama_soal" type="text" placeholder="ex : Latihan 1" required>
                     </div>
@@ -52,10 +53,10 @@
                         <!-- input file และ textarea -->
                         <div id="upload" class="tabcontent" style="display: block;">
                             <label class="form-label mt-3">Pilih File:</label>
-                            <input class="form-control" type="file" name="formFile" id="formFile">
+                            <input class="form-control" type="file" name="formFile" id="formFile" >
                         </div>
                         <div id="textarea" class="tabcontent" style="display: none;">
-                            <textarea class="form-control" id="textareaContent" name="textareaContent"></textarea>
+                            <textarea class="form-control" id="textareaContent" name="textareaContent" ></textarea>
                         </div>
                     </div>
                     <div class="col-md-3"><br>
@@ -159,9 +160,8 @@
             document.getElementById(optionName).style.display = "block";
             evt.currentTarget.className += " active";
         }
-       
     </script>
-   
+
     <script>
         $(document).ready(function() {
             let jenjang = document.getElementById("jenjang2");

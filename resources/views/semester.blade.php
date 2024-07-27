@@ -36,7 +36,7 @@
              <div class="col-md-3">
                     <label for="semester" class="form-label mt-3">Pilih Semester:</label>
                     <select class="form-control" aria-label="Default select" name="semester" id="semester" {{ !session('prodi') ? 'disabled' : '' }}>
-                        <option value="">-- Pilih Semester --</option>
+                        <option disabled selected value="">-- Pilih Semester --</option>
                         @foreach ($semester as $s)
                         <option value="{{ $s->id }}" {{ session('semester') == $s->id ? 'selected' : '' }}>{{ $s->nama }}</option>
                         @endforeach

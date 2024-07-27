@@ -1,8 +1,8 @@
 @extends('navbar')
 @section('body')
 <div class="container mt-3">
-  <h2>Daftar Soal</h2>
 
+  <h2>Daftar Soal</h2>
   <table class="table table-bordered table-light table-striped my-5">
     <thead class="table-dark">
       <input type="hidden" name="id_semester" value="1">

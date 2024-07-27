@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('nama', 255)->notNullable();
             $table->string('username', 255)->notNullable();
             $table->string('password', 180)->notNullable();
+            $table->integer('level')->notNullable();
             $table->timestamps(true, true);
         });
     }

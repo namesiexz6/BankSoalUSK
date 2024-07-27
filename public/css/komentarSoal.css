@@ -1,0 +1,481 @@
+/* Existing CSS in komentarSoal.css */
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap');
+body {
+    margin: 0;
+    padding: 0;
+}
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.leftcolumn {
+    float: left;
+    width: 70%;
+}
+
+.rightcolumn {
+    float: left;
+    width: 30%;
+    height: 100%;
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+@media screen and (max-width: 800px) {
+    .leftcolumn,
+    .rightcolumn {
+        width: 100%;
+        padding: 0;
+    }
+}
+ .row::before {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .leftcolumn {
+            float: left;
+            width: 70%;
+        }
+
+        .rightcolumn {
+            float: left;
+            width: 30%;
+            height: 100%;
+            padding-left: 10px;
+            padding-right: 20px;
+        }
+
+
+        @media screen and (max-width: 800px) {
+            .leftcolumn,
+            .rightcolumn {
+                width: 100%;
+                padding: 0;
+            }
+        }
+textarea {
+    height: 30px;
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #aaa;
+    background-color: transparent;
+    margin-bottom: px;
+    resize: none;
+    outline: none;
+    transition: .5s
+}
+
+.sidebar {
+    width: 250px;
+    margin-right: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 20px;
+}
+
+.post {
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.post:first-child {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.user {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.rating span {
+    color: #ffc107;
+}
+
+.rating a {
+    color: #007bff;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.comment {
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.button-container {
+    flex-grow: 1;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    text-align: center;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.post {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.post-header .user {
+    font-weight: bold;
+}
+
+.post-header .rating {
+    color: #ffc107;
+}
+
+.post-content {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f7f7f7;
+    border-radius: 8px;
+}
+
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+}
+
+.rating span {
+    cursor: pointer;
+    font-size: 20px;
+    color: #ddd;
+}
+
+.rating span.selected,
+.rating span:hover,
+.rating span.hover {
+    color: #ffc107;
+}
+
+.comment-button {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.comments {
+    margin-top: 20px;
+}
+
+.comment {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f1f1f1;
+    border-radius: 8px;
+    margin-left: 50px; /* ชิดขวา */
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.comment-header .user {
+    font-weight: bold;
+}
+
+.comment-header .rating {
+    color: #ffc107;
+}
+
+.comment-content {
+    margin: 10px 0;
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+}
+
+.comment-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reply-button {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* New styles from the HTML <style> tag */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.leftcolumn {
+    float: left;
+    width: 70%;
+}
+
+.rightcolumn {
+    float: left;
+    width: 30%;
+    height: 100%;
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+.card {
+    background-color: white;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+input[type=text] {
+    border: none;
+    background-color: transparent;
+    border-bottom: 2px solid rgb(124, 122, 122);
+}
+
+.comment-box {
+    position: relative;
+    border: 3px solid #8bdcfe;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.comment-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.file-upload {
+    
+    cursor: pointer;
+}
+
+.emoji-picker {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+
+.fa-image::before{
+    
+    color: #555;
+    font-size: 20px;
+}
+
+.fa-paper-plane {
+    font-size: 18px;
+    color: #555;
+}
+
+
+.image-preview {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.image-preview div {
+    position: relative;
+    display: inline-block;
+}
+
+.image-preview img {
+    max-width: 100px;
+    max-height: 100px;
+    cursor: pointer;
+}
+
+.remove-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 800px) {
+    .leftcolumn,
+    .rightcolumn {
+        width: 100%;
+        padding: 0;
+    }
+}
+
+.comment-images {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.comment-images a,
+.more-images {
+    text-align: center;
+    overflow: hidden;
+}
+
+.comment-images img {
+    width: 125px; /* Fixed width */
+    height: 125px; /* Fixed height */
+    object-fit: cover; /* Ensures image covers the area */
+    display: flex;
+    border-radius: 4px;
+    justify-content: center;
+}
+
+.more-images {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+    width: 125px;
+    height: 125px;
+    border-radius: 4px;
+}
+
+/* Popup Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.9);
+    
+}
+
+.modal-content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 80%;
+    max-height: 80%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    
+   
+}
+
+.modal-content, .close, .prev, .next {
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+
+
+@keyframes zoom {
+    from {transform: scale(0)} 
+    to {transform: scale(1)}
+}
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    z-index: 1060;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    transition: 0.3s;
+    user-select: none;
+    z-index: 1060;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0,0,0,0.8);
+}
+
+.prev {
+    left: 20px;
+}
+
+.next {
+    right: 20px;
+}

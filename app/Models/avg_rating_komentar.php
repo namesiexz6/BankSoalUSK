@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
-use DateTime;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Matakuliah extends Model
+class avg_rating_komentar extends Model
 {
-    protected $table = 'matakuliah';
+    
+    protected $table = 'avg_rating_komentar';
 
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'kode',
-        'nama',
-        'sks',
+        'id_komentar',
+        'avg_rating',
+        
     ];
 
     protected $casts = [

@@ -75,6 +75,8 @@ Route::post("/komentar", [SoalsController::class, 'komentar']);
     Route::post("/addSemester", [ManagementController::class, 'addSemester'])->name("tambahSemesterM");
     Route::post("/addMatakuliah", [ManagementController::class, 'addMatakuliah'])->name("tambahMatakuliahM");
 
+    Route::post('/submit-rating', [SoalsController::class, 'submitRating'])->name('submit.rating');
+
 
    //edit and delete data 
     Route::post("/manageJenjang", [ManagementController::class, 'jenjangM'])->name("jenjangM");

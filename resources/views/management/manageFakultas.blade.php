@@ -21,11 +21,9 @@
                         @csrf
                         <label for="jenjang" class="form-label mt-3">Pilih Jenjang:</label>
                         <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang" onchange="this.form.submit()">
-                            <option hidden disabled selected value="{{ session('jenjang') }}">
-                                {{session('jenjang_nama')}}
-                            </option>
+                            <option disabled selected value="">-- Pilih Janjang --</option>
                             @foreach ($jenjang as $jj)
-                            <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
+                            <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>{{ $jj->nama }}</option>
                             @endforeach
                         </select>
 
@@ -91,9 +89,9 @@
             <input class="form-control" name="nama_fakultas" id="nama_fakultas" type="text" placeholder="MIPA" required>
 
             <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2" required>
-                <option value="">{{-- Pilih Janjang --}}</option>
+                <option value="">-- Pilih Janjang --</option>
                 @foreach ($jenjang as $jj)
-                <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
+                <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>{{ $jj->nama }}</option>
                 @endforeach
             </select>
 
@@ -116,7 +114,7 @@
             <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2" required>
                 <option value="">-- Pilih Janjang --</option>
                 @foreach ($jenjang as $jj)
-                <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
+                <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>{{ $jj->nama }}</option>
                 @endforeach
             </select>
 

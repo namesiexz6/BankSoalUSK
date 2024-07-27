@@ -53,7 +53,7 @@
                     <div class="col-md-3">
                         <label for="semester" class="form-label mt-3">Pilih Semester:</label>
                         <select class="form-select" aria-label="Default select" name="semester" id="semester" {{ !session('prodi') ? 'disabled' : '' }}>
-                            <option value="">-- Pilih Semester --</option>
+                            <option disabled selected value="">-- Pilih Semester --</option>
                             @foreach ($semester as $s)
                             <option value="{{ $s->id }}" {{ session('semester') == $s->id ? 'selected' : '' }}>{{ $s->nama }}</option>
                             @endforeach
@@ -91,87 +91,138 @@
                     <td>{{ $matakuliahs->nama }}</td>
                     <td>{{ $matakuliahs->sks }}</td>
                     <td>
+                        <div class="d-flex">
+                        <button type="submit" name="edit" class="btn btn-info text-light" style="margin-right: 1ch; background-color: blue;" onclick="openRegisterFormEdit('{{ $matakuliahs->id }}','{{ $matakuliahs->kode }}','{{ $matakuliahs->nama }}','{{ $matakuliahs->sks }}','{{ $matakuliahs->id_semester }}')">Edit</button>
                         <form action="{{ route('matakuliahM')}}" method="post">
                             @csrf
-                            <div class="d-flex">
-                                <input type="hidden" name="matakuliah_id" value="{{ $matakuliahs->id }}">
-                                <button type="submit" name="edit" value="1" class="btn btn-info text-light" style="margin-right: 1ch; background-color: blue;">Edit</button>
-                                <button type="submit" name="edit" value="2" class="btn btn-info text-light" style="background-color: red;">Hapus</button>
-                            </div>
+
+                            <input type="hidden" name="matakuliah_id" value="{{ $matakuliahs->id }}">
+                            <button type="submit" name="edit" value="2" class="btn btn-info text-light" style="background-color: red;">Hapus</button>
+
                         </form>
-                    </td>
-
-                </tr>
-                @endforeach
-               
-            </tbody>
-        </table>
-
-        @endif
-        <button class="buttonadd" type="button" id="adressBTN" onclick="openRegisterForm()">Tambah Mata kuliah</button>
     </div>
+    </td>
 
-    <div id="registerForm" class="register-form">
+    </tr>
+    @endforeach
 
-        <form action="/register" method="post">
+    </tbody>
+    </table>
 
-            @csrf
-            <h1>Tambah Mata kuliah</h1>
-            <label class="form-label mt-3">Nama Mata kuliah:</label>
-            <input type="text" name="nama" placeholder="ex: Biologi" style="width: 100%;" required>
-            <label class="form-label mt-3">Pili alamat:</label><br>
-            <div id="addresses">
-                <div class="address">
-                    <select class="form-control jenjang2" name="jenjang2[]">
-                        <option value="">-- Pilih Janjang --</option>
-                        @foreach ($jenjang as $jj)
-                        <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
-                        @endforeach
-                    </select>
-                    <select class="form-control fakultas2" name="fakultas2[]">
-                        <option value="">-- Pilih Fakultas --</option>
-                    </select>
-                    <select class="form-control prodi2" name="prodi2[]">
-                        <option value="">-- Pilih Prodi --</option>
-                    </select>
-                    <select class="form-control semester2" name="semester2[]">
-                        <option value="">-- Pilih Semester --</option>
-                    </select>
-                </div>
+    @endif
+    <button class="buttonadd" type="button" id="adressBTN" onclick="openRegisterForm()">Tambah Mata kuliah</button>
+</div>
+
+<div id="registerForm" class="register-form">
+
+    <form action="{{ route('tambahMatakuliahM') }}" method="post" enctype="multipart/form-data">
+
+        @csrf
+        <h1>Tambah Mata kuliah</h1>
+        <label class="form-label mt-3">Kode Mata kuliah:</label>
+        <input type="text" name="kode" placeholder="ex: BM205" style="width: 100%;" required>
+        <label class="form-label mt-3">Nama Mata kuliah:</label>
+        <input type="text" name="nama" placeholder="ex: Biologi" style="width: 100%;" required>
+        <label class="form-label mt-3">SKS:</label><br>
+        <input type="text" name="sks" placeholder="ex: 3" style="width: 30%;" required><br>
+        <label class="form-label mt-3">Pilih alamat:</label><br>
+        <div id="addresses">
+            <div class="address">
+                <select class="form-control jenjang2" name="jenjang2[]">
+                    <option value="">-- Pilih Janjang --</option>
+                    @foreach ($jenjang as $jj)
+                    <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
+                    @endforeach
+                </select>
+                <select class="form-control fakultas2" name="fakultas2[]">
+                    <option value="">-- Pilih Fakultas --</option>
+                </select>
+                <select class="form-control prodi2" name="prodi2[]">
+                    <option value="">-- Pilih Prodi --</option>
+                </select>
+                <select class="form-control semester2" name="semester2[]" required>
+                    <option value="">-- Pilih Semester --</option>
+                </select>
             </div>
-            <button type="button" id="addAddressButton">Tambah Alamat</button>
+        </div>
+        <button type="button" id="addAddressButton">Tambah Alamat</button>
 
-            <button type="submit" class="registerbtn">Submit</button>
-        </form>
-    </div>
+        <button type="submit" class="registerbtn">Submit</button>
+        <button class="buttoncancel mt-3" type="button" id="adressBTN" onclick="closeRegisterForm()">Batal</button>
+    </form>
+</div>
+<div id="registerFormEdit" class="register-form">
+
+    <form action="{{ route('matakuliahM') }}" method="post" enctype="multipart/form-data">
+        @csrf
+        <h1>Edit Mata kuliah</h1>
+        <input type="hidden" name="edit" value="1">
+        <input type="hidden" name="matakuliah_id" id="matakuliah_id" value="">
+        <label class="form-label mt-3">Kode Mata kuliah:</label>
+        <input type="text" name="kode" placeholder="ex: BM205" style="width: 100%;" required>
+        <label class="form-label mt-3">Nama Mata kuliah:</label>
+        <input type="text" name="nama" placeholder="ex: Biologi" style="width: 100%;" required>
+        <label class="form-label mt-3">SKS:</label><br>
+        <input type="text" name="sks" placeholder="ex: 3" style="width: 30%;" required><br>
+        <label class="form-label mt-3">Pilih alamat:</label><br>
+        <div id="addresses2">
+            <div class="address">
+                <select class="form-control jenjang2" name="jenjang2[]">
+                    <option value="">-- Pilih Janjang --</option>
+                    @foreach ($jenjang as $jj)
+                    <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
+                    @endforeach
+                </select>
+                <select class="form-control fakultas2" name="fakultas2[]">
+                    <option value="">-- Pilih Fakultas --</option>
+                </select>
+                <select class="form-control prodi2" name="prodi2[]">
+                    <option value="">-- Pilih Prodi --</option>
+                </select>
+                <select class="form-control semester2" name="semester2[]" required>
+                    <option value="">-- Pilih Semester --</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" id="addAddressButton2">Tambah Alamat</button>
+
+        <button type="submit" class="registerbtn">Submit</button>
+        <button class="buttoncancel mt-3" type="button" id="adressBTN" onclick="closeRegisterFormEdit()">Batal</button>
+    </form>
+</div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     function openRegisterForm() {
         document.getElementById("registerForm").style.display = "block";
+
     }
 
     function closeRegisterForm() {
         document.getElementById("registerForm").style.display = "none";
     }
 
-    // ปิดฟอร์มเมื่อคลิกนอกพื้นที่ของป๊อปอัพ
-    window.onclick = function(event) {
-        var registerForm = document.getElementById("registerForm");
-        if (event.target == registerForm) {
-            registerForm.style.display = "none";
-        }
+    function openRegisterFormEdit(id, kode, nama, sks, id_semester) {
+        var form = document.getElementById("registerFormEdit");
+        var matakuliahIdInput = form.querySelector("input[name='matakuliah_id'");
+        var kodematakuliahInput = form.querySelector("input[name='kode'");
+        var namamatakuliahInput = form.querySelector("input[name='nama'");
+        var sksmatakuliahInput = form.querySelector("input[name='sks'");
+        var semesterInput = form.querySelector("select[name='semester2[]'");
+        matakuliahIdInput.value = id;
+        kodematakuliahInput.value = kode; // กำหนดค่าให้
+        namamatakuliahInput.value = nama; // กำหนดค่าให้
+        sksmatakuliahInput.value = sks; // กำหนดค่าให้
+        semesterInput.value = id_semester;
+
+        form.style.display = "block";;
     }
 
-    function addAddress() {
-        var container = document.getElementById("addresses");
-        var addressInput = document.createElement("div");
-        addressInput.innerHTML = '<select class="form-control" id="jenjang2"> <option value="">-- Pilih Janjang --</option> @foreach ($jenjang as $jj) <option value="{{ $jj->id }}">{{ $jj->nama }}</option> @endforeach </select> <select class="form-control" id="fakultas2"> <option value="">-- Pilih Fakultas --</option> @foreach ($fakultas as $f) <option value="{{ $f->id }}">{{ $f->nama }}</option> @endforeach </select> <select class="form-control" id="prodi2"> <option value="">-- Pilih Prodi --</option> @foreach ($prodi as $p) <option value="{{ $p->id }}">{{ $p->nama }}</option>@endforeach </select> <select class="form-control" id="semester2"> <option value="">-- Pilih Semester --</option> @foreach ($semester as $s) <option value="{{ $s->id }}">{{ $s->nama }}</option> @endforeach </select>';
-
-        container.appendChild(addressInput);
-
+    function closeRegisterFormEdit() {
+        document.getElementById("registerFormEdit").style.display = "none";
     }
 </script>
+
 <script>
     $(document).ready(function() {
         let jenjang = $('#jenjang');
@@ -374,8 +425,32 @@
             attachListeners(); // Re-attach listeners to new elements
         }
 
+        function addAddress2() {
+            var container = $('#addresses2');
+            var addressInput = `
+            <div class="address">
+                <select class="form-control jenjang2" name="jenjang2[]">
+                    <option value="">-- Pilih Janjang --</option>
+                    @foreach ($jenjang as $jj)
+                    <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
+                    @endforeach
+                </select>
+                <select class="form-control fakultas2" name="fakultas2[]">
+                    <option value="">-- Pilih Fakultas --</option>
+                </select>
+                <select class="form-control prodi2" name="prodi2[]">
+                    <option value="">-- Pilih Prodi --</option>
+                </select>
+                <select class="form-control semester2" name="semester2[]">
+                    <option value="">-- Pilih Semester --</option>
+                </select>
+            </div>`;
+            container.append(addressInput);
+            attachListeners(); // Re-attach listeners to new elements
+        }
         // Attach addAddress function to the button
         $('#addAddressButton').on('click', addAddress);
+        $('#addAddressButton2').on('click', addAddress2);
     });
 </script>
 

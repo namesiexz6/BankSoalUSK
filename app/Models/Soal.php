@@ -15,6 +15,7 @@ class Soal extends Model
         'nama',
         'id_mk',
         'nama_soal',
+        'tipe',
         'isi_soal',
     ];
 

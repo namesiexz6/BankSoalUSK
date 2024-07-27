@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Soal;
 use App\Models\Matakuliah;
 use App\Models\KomentarSoal;
+use App\Models\rating_komentar;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use HtmlToRtf\HtmlToRtf;
+use Illuminate\Support\Facades\Log;
 
 class SoalsController extends Controller
 {
@@ -22,7 +25,7 @@ class SoalsController extends Controller
         $id_mk = $request->input("matakuliah2");
         $nama_soal = $request->input("nama_soal");
         $nama = auth()->user()->nama;
-   
+
         if (!$isi_soal) {
             if (!$isi_soaltext) {
                 return redirect("/manageSoal");
@@ -31,7 +34,7 @@ class SoalsController extends Controller
             if (!Storage::disk('public')->exists('html')) {
                 Storage::disk('public')->makeDirectory('html');
             }
-            
+            $tipe = 2;
             $fileName = time() . '_' . $nama_soal . '_' . $nama . '.html';
             Storage::disk('public')->put('html/' . $fileName, $isi_soaltext);
 
@@ -40,6 +43,7 @@ class SoalsController extends Controller
                 'nama' => $nama,
                 'id_mk' => $id_mk,
                 'nama_soal' => $nama_soal,
+                'tipe' => $tipe,
                 'isi_soal' => $fileName
             ]);
             return redirect("/manageSoal");
@@ -48,12 +52,14 @@ class SoalsController extends Controller
         $fileName = time() . '_' . $isi_soal->getClientOriginalName();
         $isi_soal->storeAs('pdf', $fileName, 'public');
 
-
+        $tipe = 1;
         Soal::create([
             'nama' => $nama,
             'id_mk' => $id_mk,
             'nama_soal' => $nama_soal,
+            'tipe' => $tipe,
             'isi_soal' => $fileName
+
         ]);
         return redirect("/manageSoal");
     }
@@ -78,36 +84,90 @@ class SoalsController extends Controller
         $id_soal = $request->input("soals_id");
         $soal = Soal::where("id", $id_soal)->orderBy("id", "asc")->get();
         $komentar_soal = KomentarSoal::where("id_soal", $id_soal)->orderBy("id", "asc")->get();
-
-        return view("lihatsoal", compact('soal', 'komentar_soal'));
+        $user_ids = $komentar_soal->pluck('id_user')->unique();
+        $user = User::whereIn("id", $user_ids)->orderBy("id", "asc")->get()->keyBy('id');
+    
+        $usernow = Auth::user();
+        
+        $ratings = rating_komentar::where('id_user', $usernow->id)
+            ->whereIn('id_komentar', $komentar_soal->pluck('id'))
+            ->get()
+            ->keyBy('id_komentar');
+    
+        $ratingData = rating_komentar::selectRaw('id_komentar, AVG(rating) as avg_rating, COUNT(id) as rating_count')
+            ->whereIn('id_komentar', $komentar_soal->pluck('id'))
+            ->groupBy('id_komentar')
+            ->get()
+            ->keyBy('id_komentar');
+    
+        return view("lihatsoal", compact('soal', 'komentar_soal', 'user', 'usernow', 'ratings', 'ratingData'));
     }
-
+    
     public function komentar(Request $request)
     {
-        $id_soal = $request->input("soals_id");
-        $nama = auth()->user()->nama;
-        $isi_komentar = $request->input("isi_komentar");
-        $hapus = $request->input("hapus");
-        $id = $request->input("komentar_id");
-
-        if ($hapus == "1") {
-            KomentarSoal::where("id", $id)->delete();
-            return redirect("/lihatsoal?soals_id=" . $id_soal);
-        }
-
-        if (!$nama || !$isi_komentar) {
-            return redirect("/lihatsoal?soals_id=" . $id_soal);
-        }
-
-        KomentarSoal::create([
-            'id_soal' => $id_soal,
-            'nama_komentar' => $nama,
-            'isi_komentar' => $isi_komentar,
+        $request->validate([
+            'id_soal' => 'required|exists:soal,id',
+            'isi_komentar' => 'required|string|max:255',
+            'file_komentar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        return redirect("/lihatsoal?soals_id=" . $id_soal);
+        // สร้างคอมเมนต์ใหม่
+        $komentar = new KomentarSoal();
+        $komentar->id_soal = $request->id_soal;
+        $komentar->id_user = Auth::id();
+        $komentar->isi_komentar = $request->isi_komentar;
+        $komentar->save();
+
+        $images = [];
+        if ($request->hasfile('file_komentar')) {
+            $destinationPath = 'public/komentarSoal/' . $komentar->id_soal;
+            $i = 1; // เริ่มต้นตัวเลขลำดับจาก 1
+            foreach ($request->file('file_komentar') as $file) {
+                $filename = $komentar->id . '_' . $komentar->id_user . '_' . $i . '.' . $file->getClientOriginalExtension();
+                $file->storeAs($destinationPath, $filename);
+                $images[] = $filename;
+                $i++; // เพิ่มตัวเลขลำดับ
+            }
+            $komentar->file_komentar = json_encode($images);
+        }
+
+        $komentar->save();
+
+        // ส่งข้อมูลไปแสดงผลใน View
+        return response()->json(['success' => 'Comment added successfully with ' . count($images) . ' images']);
     }
 
+    public function submitRating(Request $request)
+    {
+        $request->validate([
+            'id_komentar' => 'required|exists:komentar_soal,id',
+            'rating' => 'required|integer|min:1|max:5'
+        ]);
+    
+        $rating = rating_komentar::updateOrCreate(
+            [
+                'id_komentar' => $request->id_komentar,
+                'id_user' => Auth::id()
+            ],
+            [
+                'rating' => $request->rating
+            ]
+        );
+    
+        $komentar = KomentarSoal::find($request->id_komentar);
+        $avgRating = rating_komentar::where('id_komentar', $request->id_komentar)
+                    ->avg('rating');
+        $ratingCount = rating_komentar::where('id_komentar', $request->id_komentar)
+                        ->count();
+    
+        return response()->json([
+            'success' => true,
+            'avg_rating' => number_format($avgRating, 1),
+            'rating_count' => $ratingCount,
+            'komentar_id' => $request->id_komentar
+        ]);
+    }
+    
     public function editmatakuliah($response, $request, $session)
     {
         $semester = $request->input("semester");

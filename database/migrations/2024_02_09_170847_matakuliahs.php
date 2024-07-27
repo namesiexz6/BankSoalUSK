@@ -12,8 +12,6 @@ return new class extends Migration
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_semester');
-            $table->foreign('id_semester')->references('id')->on('semester');
             $table->string('kode', 255)->notNullable();
             $table->string('nama', 255)->notNullable();
             $table->integer('sks')->notNullable();

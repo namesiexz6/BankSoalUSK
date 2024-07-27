@@ -39,12 +39,14 @@ class AuthController extends Controller
         $nama = $request->input('nama');
         $username = $request->input('username');
         $password = $request->input('password');
+        $level = $request->input('level');
 
        
             User::create([
                 'nama' => $nama,
                 'username' => $username,
                 'password' => Hash::make($password),
+                'level' => $level,
             ]);
         
 

@@ -42,7 +42,7 @@
                     <div class="col-md-3">
                         <label for="prodi" class="form-label mt-3">Pilih Prodi:</label>
                         <select class="form-select" aria-label="Default select" name="prodi" id="prodi" {{ !session('fakultas') ? 'disabled' : '' }}>
-                            <option value="">-- Pilih Prodi --</option>
+                            <option disabled selected value="">-- Pilih Prodi --</option>
                             @foreach ($prodi as $p)
                             <option value="{{ $p->id }}" {{ session('prodi') == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
                             @endforeach
@@ -254,13 +254,7 @@
         document.getElementById("registerForm").style.display = "none";
     }
 
-    // ปิดฟอร์มเมื่อคลิกนอกพื้นที่ของป๊อปอัพ
-    window.onclick = function(event) {
-        var registerForm = document.getElementById("registerForm");
-        if (event.target == registerForm) {
-            registerForm.style.display = "none";
-        }
-    }
+   
 
     function openRegisterFormEdit(id, nama, id_prodi) {
         var form = document.getElementById("registerFormEdit");
@@ -276,13 +270,7 @@
     function closeRegisterFormEdit() {
         document.getElementById("registerFormEdit").style.display = "none";
     }
-    // ปิดฟอร์มเมื่อคลิกนอกพื้นที่ของป๊อปอัพ
-    window.onclick = function(event) {
-        var registerFormEdit = document.getElementById("registerFormEdit");
-        if (event.target == registerFormEdit) {
-            registerFormEdit.style.display = "none";
-        }
-    }
+   
 </script>
 <script>
     $(document).ready(function() {

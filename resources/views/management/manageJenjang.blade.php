@@ -79,7 +79,7 @@
             <input type="hidden" name="edit" value="1">
             <label class="form-label mt-3">Nama Janjang:</label>
             <input type="hidden" name="jenjang_id" id="jenjang_id" value="">
-            <input class="form-control" name="nama_jenjang" id="nama_jenjang" type="text" value="{{ $j->nama }}" required>
+            <input class="form-control" name="nama_jenjang" id="nama_jenjang" type="text" value="" required>
 
             <button type="submit" class="registerbtn">Submit</button>
             <button class="buttoncancel mt-3" type="button" id="adressBTN" onclick="closeRegisterFormEdit()">Batal</button>

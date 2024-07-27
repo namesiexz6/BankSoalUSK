@@ -6,16 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    protected $tableName = 'komentar_soal';
+    protected $tableName = 'rating_komentar';
 
     public function up()
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_soal');
-            $table->foreign('id_soal')->references('id')->on('soal');
-            $table->string('nama_komentar', 255)->notNullable();
-            $table->string('isi_komentar', 255)->notNullable();
+            $table->unsignedBigInteger('id_komentar');
+            $table->foreign('id_komentar')->references('id')->on('komentar_soal');
+            $table->unsignedBigInteger('id_user')->notNullable();
+            $table->unsignedBigInteger('rating')->notNullable();
             $table->timestamps(true, true);
         });
     }

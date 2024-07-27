@@ -5,16 +5,16 @@ namespace App\Models;
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
-class Matakuliah extends Model
+class multi_mk extends Model
 {
-    protected $table = 'matakuliah';
+    protected $table = 'multi_mk';
 
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'kode',
-        'nama',
-        'sks',
+        'id_mk',
+        'id_semester',
+        
     ];
 
     protected $casts = [

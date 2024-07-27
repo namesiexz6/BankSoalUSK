@@ -14,8 +14,10 @@ class KomentarSoal extends Model
 
     protected $fillable = [
         'id_soal',
-        'nama_komentar',
+        'id_user',
         'isi_komentar',
+        'file_komentar',
+        'parent_id',
     ];
 
     protected $casts = [

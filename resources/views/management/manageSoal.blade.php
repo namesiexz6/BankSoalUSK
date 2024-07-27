@@ -61,7 +61,7 @@
                     <div class="col-md-3">
                         <label for="matakuliah" class="form-label mt-3">Pilih Matakuliah:</label>
                         <select class="form-select" aria-label="Default select" name="matakuliah" id="matakuliah" {{ !session('prodi') ? 'disabled' : '' }}>
-                            <option value="">-- Pilih Matakuliah --</option>
+                            <option disabled selected value="">-- Pilih Matakuliah --</option>
                             @foreach ($matakuliah as $m)
                             <option value="{{ $m->id }}" {{ session('matakuliah') == $m->id ? 'selected' : '' }}>{{ $m->nama }}</option>
                             @endforeach

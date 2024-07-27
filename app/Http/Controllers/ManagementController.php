@@ -9,6 +9,7 @@ use App\Models\Semester;
 use App\Models\Matakuliah;
 use Illuminate\Http\Request;
 use App\Models\KomentarSoal;
+use App\Models\multi_mk;
 use App\Models\Soal;
 
 
@@ -60,20 +61,33 @@ class ManagementController extends Controller
         ]);
         return redirect("/manageSemester");
     }
+
     public function addMatakuliah(Request $request)
     {
-        $id_semester = $request->input("id_semester");
+        // รับค่าจากฟอร์ม
+        $kode = $request->input("kode");
         $nama = $request->input("nama");
         $sks = $request->input("sks");
 
-        Matakuliah::create([
-            'id_semester' => $id_semester,
+        // สร้างบันทึกข้อมูลในตาราง matakuliah
+        $matakuliah = Matakuliah::create([
+            'kode' => $kode,
             'nama' => $nama,
             'sks' => $sks,
-
         ]);
 
-        return redirect("/");
+        $semesters = $request->input("semester2");
+
+        // Loop เพื่อสร้างบันทึกข้อมูลในตาราง multi_mk
+        foreach ($semesters as $key => $semester) {
+            multi_mk::create([
+                'id_mk' => $matakuliah->id,
+                'id_semester' => $semester,
+              
+            ]);
+        }
+
+        return redirect("/manageMatakuliah");
     }
     public function jenjangM(Request $request)
     {
@@ -83,11 +97,13 @@ class ManagementController extends Controller
             $fakultas = Fakultas::where("id_jenjang", $id)->orderBy("id", "asc")->get();
             $prodi = Prodi::whereIn("id_fakultas", $fakultas->pluck('id')->toArray())->orderBy("id", "asc")->get();
             $semester = Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->orderBy("id", "asc")->get();
-            $mk = Matakuliah::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id", "asc")->get();
+            $multi_mk = multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id_mk", "asc")->get();
+            $mk = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
             $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
             KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
             Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
-            Matakuliah::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
+            multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
+            Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->delete();
             Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->delete();
             Prodi::whereIn("id_fakultas", $fakultas->pluck('id')->toArray())->delete();
             Fakultas::where("id_jenjang", $id)->delete();
@@ -115,11 +131,13 @@ class ManagementController extends Controller
             $id = $request->input("fakultas_id");
             $prodi = Prodi::where("id_fakultas", $id)->orderBy("id", "asc")->get();
             $semester = Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->orderBy("id", "asc")->get();
-            $mk = Matakuliah::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id", "asc")->get();
+            $multi_mk = multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id_mk", "asc")->get();
+            $mk = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
             $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
             KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
             Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
-            Matakuliah::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
+            multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
+            Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->delete();
             Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->delete();
             Prodi::where("id_fakultas", $id)->delete();
             Fakultas::where("id", $id)->delete();
@@ -147,11 +165,13 @@ class ManagementController extends Controller
         if ($prodi == 2) {
             $id = $request->input("prodi_id");
             $semester = Semester::where("id_prodi", $id)->orderBy("id", "asc")->get();
-            $mk = Matakuliah::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id", "asc")->get();
+            $multi_mk = multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id_mk", "asc")->get();
+            $mk = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
             $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
             KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
             Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
-            Matakuliah::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
+            multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
+            Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->delete();
             Semester::where("id_prodi", $id)->delete();
             Prodi::where("id", $id)->delete();
 
@@ -180,11 +200,13 @@ class ManagementController extends Controller
         if ($semester == 2) {
 
             $id = $request->input("semester_id");
-            $mk = Matakuliah::where("id_semester", $id)->orderBy("id", "asc")->get();
+            $multi_mk = multi_mk::where("id_semester", $id)->orderBy("id_mk", "asc")->get();
+            $mk = Matakuliah::where("id", $multi_mk)->orderBy("id", "asc")->get();
             $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
             KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
             Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
-            Matakuliah::where("id_semester", $id)->delete();
+            multi_mk::where("id_semester", $id)->delete();
+            Matakuliah::where("id", $multi_mk)->delete();
             Semester::where("id", $id)->delete();
 
 
@@ -215,10 +237,31 @@ class ManagementController extends Controller
             $soal = Soal::where("id_mk", $id)->orderBy("id", "asc")->get();
             KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
             Soal::where("id_mk", $id)->delete();
+            multi_mk::where("id_mk", $id)->delete();
             Matakuliah::where("id", $id)->delete();
 
             return redirect("/manageMatakuliah");
-        } else {
+        }elseif($matakuliah == 1){
+            $id = $request->input("matakuliah_id");
+            $kode = $request->input("kode");
+            $nama = $request->input("nama");
+            $sks = $request->input("sks");
+            $semesters = $request->input("semester2");
+            Matakuliah::where('id', $id)->update([
+                'kode' => $kode,
+                'nama' => $nama,
+                'sks' => $sks,
+            ]);
+            multi_mk::where("id_mk", $id)->delete();
+            foreach ($semesters as $key => $semester) {
+                multi_mk::create([
+                    'id_mk' => $id,
+                    'id_semester' => $semester,
+                ]);
+            }
+            return redirect('/manageMatakuliah');
+        }
+        else {
 
             return redirect("/management");
         }
@@ -370,13 +413,13 @@ class ManagementController extends Controller
         $prodi = Prodi::all();
         $semester = Semester::all();
         $matakuliah = Matakuliah::all();
+        $multi_mk = multi_mk::all();
 
         if (session("Manage_id") == 1) {
-            return view("management/manageSoal", compact('jenjang', 'fakultas', 'prodi', 'semester', 'matakuliah'));
+            return view("management/manageSoal", compact('jenjang', 'fakultas', 'prodi', 'semester', 'matakuliah', 'multi_mk'));
         } elseif (session("Manage_id") == 2) {
-            $matakuliah = Matakuliah::where("id_semester", $id_semester)->orderBy("id", "asc")->get();
-
-
+            $multi_mk = multi_mk::where("id_semester", $id_semester)->orderBy("id_mk", "asc")->get();
+            $matakuliah = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
             return view("management/manageMatakuliah", compact('jenjang', 'fakultas', 'prodi', 'semester', 'matakuliah'));
         } elseif (session("Manage_id") == 3) {
             return view("management/manageSemester", compact('jenjang', 'fakultas', 'prodi', 'semester', 'matakuliah'));
@@ -457,8 +500,11 @@ class ManagementController extends Controller
 
     public function cariMatakuliahM2(Request $request)
     {
+        
 
-        $data['matakuliah'] = Matakuliah::where("id_semester", $request->id_semester)
+        $data['multi_mk'] = multi_mk::where("id_semester", $request->id_semester)
+            ->get(["id_mk"]);
+        $data['matakuliah'] = Matakuliah::whereIn("id", $data['multi_mk']->pluck('id_mk')->toArray())
             ->get(["nama", "id"]);
 
         return response()->json($data);
@@ -483,7 +529,9 @@ class ManagementController extends Controller
         $data['prodi'] = Prodi::get(["nama", "id"]);
         $data['semester'] = Semester::get(["nama", "id"]);
         $data['matakuliah'] = Matakuliah::get(["nama", "id"]);
+        $data['multi_mk'] = multi_mk::get(["id_mk", "id_semester"]);
         $data['soal'] = Soal::get(["nama", "id"]);
+
 
 
         session()->put("Manage_id", 0);
@@ -498,6 +546,7 @@ class ManagementController extends Controller
         $data['prodi'] = Prodi::get(["nama", "id"]);
         $data['semester'] = Semester::get(["nama", "id"]);
         $data['matakuliah'] = Matakuliah::get(["nama", "id"]);
+        $data['multi_mk'] = multi_mk::get(["id_mk", "id_semester"]);
         $data['soal'] = Soal::all();
         session()->put("Manage_id", 1);
 
@@ -513,6 +562,7 @@ class ManagementController extends Controller
         $data['prodi'] = Prodi::get(["nama", "id"]);
         $data['semester'] = Semester::get(["nama", "id"]);
         $data['matakuliah'] = Matakuliah::get(["nama", "id"]);
+        $data['multi_mk'] = multi_mk::get(["id_mk", "id_semester"]);
         $data['soal'] = Soal::all();
         session()->put("Manage_id", 1);
 
@@ -527,6 +577,7 @@ class ManagementController extends Controller
         $data['prodi'] = Prodi::get(["nama", "id"]);
         $data['semester'] = Semester::get(["nama", "id"]);
         $data['matakuliah'] = Matakuliah::all();
+        $data['multi_mk'] = multi_mk::get(["id_mk", "id_semester"]);
 
 
         session()->put("Manage_id", 2);
