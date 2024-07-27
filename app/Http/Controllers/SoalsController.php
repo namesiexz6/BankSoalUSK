@@ -86,23 +86,26 @@ class SoalsController extends Controller
         $komentar_soal = KomentarSoal::where("id_soal", $id_soal)->orderBy("id", "asc")->get();
         $user_ids = $komentar_soal->pluck('id_user')->unique();
         $user = User::whereIn("id", $user_ids)->orderBy("id", "asc")->get()->keyBy('id');
-    
+
         $usernow = Auth::user();
-        
+
         $ratings = rating_komentar::where('id_user', $usernow->id)
             ->whereIn('id_komentar', $komentar_soal->pluck('id'))
             ->get()
             ->keyBy('id_komentar');
-    
+
         $ratingData = rating_komentar::selectRaw('id_komentar, AVG(rating) as avg_rating, COUNT(id) as rating_count')
             ->whereIn('id_komentar', $komentar_soal->pluck('id'))
             ->groupBy('id_komentar')
             ->get()
             ->keyBy('id_komentar');
-    
-        return view("lihatsoal", compact('soal', 'komentar_soal', 'user', 'usernow', 'ratings', 'ratingData'));
+
+        $komentar_parents = $komentar_soal->whereNull('parent_id');
+        $komentar_replies = $komentar_soal->whereNotNull('parent_id')->groupBy('parent_id');
+
+        return view("lihatsoal", compact('soal', 'komentar_parents', 'komentar_replies', 'user', 'usernow', 'ratings', 'ratingData'));
     }
-    
+
     public function komentar(Request $request)
     {
         $request->validate([
@@ -143,7 +146,7 @@ class SoalsController extends Controller
             'id_komentar' => 'required|exists:komentar_soal,id',
             'rating' => 'required|integer|min:1|max:5'
         ]);
-    
+
         $rating = rating_komentar::updateOrCreate(
             [
                 'id_komentar' => $request->id_komentar,
@@ -153,13 +156,13 @@ class SoalsController extends Controller
                 'rating' => $request->rating
             ]
         );
-    
+
         $komentar = KomentarSoal::find($request->id_komentar);
         $avgRating = rating_komentar::where('id_komentar', $request->id_komentar)
-                    ->avg('rating');
+            ->avg('rating');
         $ratingCount = rating_komentar::where('id_komentar', $request->id_komentar)
-                        ->count();
-    
+            ->count();
+
         return response()->json([
             'success' => true,
             'avg_rating' => number_format($avgRating, 1),
@@ -167,7 +170,7 @@ class SoalsController extends Controller
             'komentar_id' => $request->id_komentar
         ]);
     }
-    
+
     public function editmatakuliah($response, $request, $session)
     {
         $semester = $request->input("semester");

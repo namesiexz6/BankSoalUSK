@@ -2,231 +2,12 @@
 @section('body')
 
 <head>
-    <link rel="stylesheet" href="/css/komentarSoal.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        .row:after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-
-        .leftcolumn {
-            float: left;
-            width: 70%;
-        }
-
-        .rightcolumn {
-            float: left;
-            width: 30%;
-            height: 100%;
-            padding-left: 10px;
-            padding-right: 20px;
-        }
-
-        .card {
-            background-color: white;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        input[type=text] {
-            border: none;
-            background-color: transparent;
-            border-bottom: 2px solid rgb(124, 122, 122);
-        }
-
-        .comment-box {
-            position: relative;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        .comment-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .file-upload {
-            cursor: pointer;
-        }
-
-        .emoji-picker {
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .fa-image,
-        .fa-paper-plane {
-            font-size: 18px;
-            color: #555;
-        }
-
-        .image-preview {
-            margin-top: 10px;
-            max-height: 200px;
-            overflow: hidden;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .image-preview div {
-            position: relative;
-            display: inline-block;
-        }
-
-        .image-preview img {
-            max-width: 100px;
-            max-height: 100px;
-            cursor: pointer;
-        }
-
-        .remove-icon {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        @media screen and (max-width: 800px) {
-            .leftcolumn,
-            .rightcolumn {
-                width: 100%;
-                padding: 0;
-            }
-        }
-
-        .comment-images {
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 10px;
-            align-items: center;
-            justify-content: flex-start;
-        }
-
-        .comment-images a,
-        .more-images {
-            flex: 1;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        .comment-images img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .more-images {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            text-align: center;
-            position: relative;
-            width: 100px;
-            height: 50px;
-            border-radius: 4px;
-        }
-
-        /* Popup Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1050;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.9);
-        }
-
-        .modal-content-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-
-        .modal-content {
-            margin: auto;
-            display: block;
-            max-width: 80%;
-            max-height: 80%;
-            width: auto;
-            height: auto;
-        }
-
-        .modal-content, .close, .prev, .next {
-            animation-name: zoom;
-            animation-duration: 0.6s;
-        }
-
-        @keyframes zoom {
-            from {transform: scale(0)} 
-            to {transform: scale(1)}
-        }
-
-        .close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-            z-index: 1060;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .prev, .next {
-            cursor: pointer;
-            position: absolute;
-            top: 50%;
-            width: auto;
-            padding: 16px;
-            margin-top: -50px;
-            color: white;
-            font-weight: bold;
-            font-size: 20px;
-            transition: 0.3s;
-            user-select: none;
-            z-index: 1060;
-        }
-
-        .prev:hover, .next:hover {
-            background-color: rgba(0,0,0,0.8);
-        }
-
-        .prev {
-            left: 20px;
-        }
-
-        .next {
-            right: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/komentarSoal.css">
 </head>
 
 <div class="row">
@@ -242,82 +23,134 @@
             @endforeach
         </div>
     </div>
-    <div class="rightcolumn">
-        <div class="container mt-4">
-            <h2>Komentar</h2>
-            @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
+    <div class="rightcolumn" id="rightcolumn">
+
+        @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+        @endif
+        <form class="mt-4" action="/komentar" method="post" enctype="multipart/form-data" id="comment-form">
+            @csrf
+            <input type="hidden" name="id_soal" value="{{ $soals->id }}">
+            <div class="comment-box">
+                <h2>Komentar</h2>
+                <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
+                <div class="comment-actions">
+                    <label for="file-upload" class="file-upload">
+                        <input type="file" id="file-upload" name="file_komentar[]" accept="image/*" multiple style="display: none;" onchange="previewImages(event)">
+                        <i class="fa fa-image"></i>
+                    </label>
+                    <button type="button" class="btn btn-info text-light" onclick="submitForm()">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="image-preview" id="image-preview"></div>
+            </div>
+        </form>
+
+        @foreach ($komentar_parents as $komentar)
+        <div class="post" id="post-{{ $komentar->id }}">
+            <div class="post-header">
+                <div class="user">{{ $user->get($komentar->id_user)->nama }}</div>
+                <div class="avg_rating" data-komentar-id="{{ $komentar->id }}">
+                    <span>★</span>
+                    <span>{{ isset($ratingData[$komentar->id]) ? number_format($ratingData[$komentar->id]->avg_rating, 1) : '0.0' }}</span>
+                    <span>({{ isset($ratingData[$komentar->id]) ? $ratingData[$komentar->id]->rating_count : '0' }})</span>
+                </div>
+            </div>
+            <div class="post-content">{{ $komentar->isi_komentar }}</div>
+            @if ($komentar->file_komentar)
+            <div class="comment-images">
+                @php
+                $images = json_decode($komentar->file_komentar);
+                $imageCount = count($images);
+                @endphp
+
+                @foreach ($images as $index => $image)
+                @if ($index < 2) <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})">
+                    <img src="{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}" alt="Comment Image">
+                    </a>
+                    @endif
+                    @endforeach
+
+                    @if ($imageCount > 2)
+                    <div class="more-images" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $images[2]) }}', 2, {{ json_encode($images) }})">+{{ $imageCount - 2 }}</div>
+                    @endif
+
+                    <!-- Hidden images for Lightbox -->
+                    @foreach ($images as $index => $image)
+                    @if ($index >= 2)
+                    <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})" style="display:none;">
+                        <img src="{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}" alt="Comment Image">
+                    </a>
+                    @endif
+                    @endforeach
             </div>
             @endif
-            <form class="mt-2" action="/komentar" method="post" enctype="multipart/form-data" id="comment-form">
-                @csrf
-                <input type="hidden" name="id_soal" value="{{ $soals->id }}">
-                <div class="comment-box">
-                    <textarea class="mb-5" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
-                    <div class="comment-actions">
-                        <label for="file-upload" class="file-upload">
-                            <input type="file" id="file-upload" name="file_komentar[]" accept="image/*" multiple style="display: none;" onchange="previewImages(event)">
-                            <i class="fa fa-image"></i>
-                        </label>
-                        <button type="button" class="btn btn-info text-light" onclick="submitForm()">
-                            <i class="fa fa-paper-plane"></i>
-                        </button>
-                    </div>
-                    <div class="image-preview" id="image-preview"></div>
+            <div class="post-footer">
+                <div class="rating" data-komentar-id="{{ $komentar->id }}">
+                    @for ($i = 1; $i <= 5; $i++) <span data-rating="{{ $i }}" class="{{ isset($ratings[$komentar->id]) && $ratings[$komentar->id]->rating >= $i ? 'selected' : '' }}">★</span>
+                        @endfor
                 </div>
-            </form>
+                <div class="comment-button">Balas</div>
+            </div>
         </div>
+        <!-- Replies -->
+        @if (isset($komentar_replies[$komentar->id]))
+        <div class="replies">
+            @foreach ($komentar_replies[$komentar->id] as $reply)
+            <div class="comment" id="post-reply-{{ $reply->id }}">
+                <div class="comment-header">
+                    <div class="user">{{ $user->get($reply->id_user)->nama }}</div>
+                    <div class="avg_rating" data-komentar-id="{{ $reply->id }}">
+                        <span>★</span>
+                        <span>{{ isset($ratingData[$reply->id]) ? number_format($ratingData[$reply->id]->avg_rating, 1) : '0.0' }}</span>
+                        <span>({{ isset($ratingData[$reply->id]) ? $ratingData[$reply->id]->rating_count : '0' }})</span>
+                    </div>
+                </div>
+                <div class="comment-content">{{ $reply->isi_komentar }}</div>
+                @if ($reply->file_komentar)
+                <div class="comment-images">
+                    @php
+                    $images = json_decode($reply->file_komentar);
+                    $imageCount = count($images);
+                    @endphp
 
-       @foreach ($komentar_soal as $komentar)
-<div class="post">
-    <div class="post-header">
-        <div class="user">{{ $user->get($komentar->id_user)->nama }}</div>
-        <div class="rating">4.0 ★★★★☆(58)</div>
-    </div>
-    <div class="post-content">{{ $komentar->isi_komentar }}</div>
-    @if ($komentar->file_komentar)
-    <div class="comment-images">
-        @php
-        $images = json_decode($komentar->file_komentar);
-        $imageCount = count($images);
-        @endphp
+                    @foreach ($images as $index => $image)
+                    @if ($index < 2) <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})">
+                        <img src="{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}" alt="Comment Image">
+                        </a>
+                        @endif
+                        @endforeach
 
-        @foreach ($images as $index => $image)
-        @if ($index < 2)
-        <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})">
-            <img src="{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}" alt="Comment Image">
-        </a>
-        @endif
-        @endforeach
+                        @if ($imageCount > 2)
+                        <div class="more-images" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $images[2]) }}', 2, {{ json_encode($images) }})">+{{ $imageCount - 2 }}</div>
+                        @endif
 
-        @if ($imageCount > 2)
-        <div class="more-images" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $images[2]) }}', 2, {{ json_encode($images) }})">+{{ $imageCount - 2 }}</div>
-        @endif
-
-        <!-- Hidden images for Lightbox -->
-        @foreach ($images as $index => $image)
-        @if ($index >= 2)
-        <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})" style="display:none;">
-            <img src="{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}" alt="Comment Image">
-        </a>
-        @endif
-        @endforeach
-    </div>
-    @endif
-    <div class="post-footer">
-        <div class="rating">
-            <span data-rating="1">★</span>
-            <span data-rating="2">★</span>
-            <span data-rating="3">★</span>
-            <span data-rating="4">★</span>
-            <span data-rating="5">★</span>
+                        <!-- Hidden images for Lightbox -->
+                        @foreach ($images as $index => $image)
+                        @if ($index >= 2)
+                        <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})" style="display:none;">
+                            <img src="{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}" alt="Comment Image">
+                        </a>
+                        @endif
+                        @endforeach
+                </div>
+                @endif
+                <div class="comment-footer">
+                    <div class="rating" data-komentar-id="{{ $reply->id }}">
+                        @for ($i = 1; $i <= 5; $i++) <span data-rating="{{ $i }}" class="{{ isset($ratings[$reply->id]) && $ratings[$reply->id]->rating >= $i ? 'selected' : '' }}">★</span>
+                            @endfor
+                    </div>
+                    
+                </div>
+            </div>
+            @endforeach
         </div>
-        <div class="comment-button">Comment</div>
-    </div>
-</div>
-@endforeach
+        @endif
 
+        @endforeach
 
     </div>
 </div>
@@ -378,29 +211,46 @@
     function submitForm() {
         const form = document.getElementById('comment-form');
         const formData = new FormData(form);
+        const commentInput = form.querySelector('textarea[name="isi_komentar"]').value.trim();
+        const maxFileSize = 2048 * 1024; // ขนาดไฟล์สูงสุดในหน่วย bytes (2048 KB)
+        let isValid = true;
 
+        // ตรวจสอบว่ามีการเขียนคอมเม้นหรือไม่
+        if (commentInput === '') {
+            alert('กรุณาเขียนคอมเม้น');
+            isValid = false;
+        }
+
+        // ตรวจสอบขนาดไฟล์
         imageFiles.forEach(file => {
+            if (file.size > maxFileSize) {
+                alert('ไฟล์ขนาดใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 2 MB');
+                isValid = false;
+            }
             formData.append('file_komentar[]', file);
         });
 
-        fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    window.location.href = "/lihatsoal?soals_id=" + form.querySelector('input[name="id_soal"]').value;
-                }
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
+        // หากข้อมูลถูกต้องให้ส่งฟอร์ม
+        if (isValid) {
+            fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "/lihatsoal?soals_id=" + form.querySelector('input[name="id_soal"]').value;
+                    }
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
     }
 
     function openImageModal(src, index, images) {
@@ -430,5 +280,88 @@
         var modalImg = document.getElementById("modalImage");
         modalImg.src = imageList[currentImageIndex];
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        bindRatingEvents();
+
+        function bindRatingEvents() {
+            document.querySelectorAll('.rating span').forEach(star => {
+                star.addEventListener('click', function() {
+                    let rating = this.getAttribute('data-rating');
+                    let komentarId = this.parentNode.getAttribute('data-komentar-id');
+                    let stars = this.parentNode.children;
+                    for (let i = 0; i < stars.length; i++) {
+                        if (i < rating) {
+                            stars[i].classList.add('selected');
+                        } else {
+                            stars[i].classList.remove('selected');
+                        }
+                    }
+
+                    fetch('{{ route("submit.rating") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                id_komentar: komentarId,
+                                rating: rating
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const avgRatingElement = document.querySelector(`.avg_rating[data-komentar-id="${data.komentar_id}"]`);
+                                avgRatingElement.querySelector('span:nth-child(2)').textContent = data.avg_rating;
+                                avgRatingElement.querySelector('span:nth-child(3)').textContent = `(${data.rating_count})`;
+
+                                // รีเฟรช rightcolumn
+                                loadRightColumn();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
+
+                star.addEventListener('mouseover', function() {
+                    let rating = this.getAttribute('data-rating');
+                    let stars = this.parentNode.children;
+                    for (let i = 0; i < stars.length; i++) {
+                        if (i < rating) {
+                            stars[i].classList.add('hover');
+                        } else {
+                            stars[i].classList.remove('hover');
+                        }
+                    }
+                });
+
+                star.addEventListener('mouseout', function() {
+                    let stars = this.parentNode.children;
+                    for (let i = 0; i < stars.length; i++) {
+                        stars[i].classList.remove('hover');
+                    }
+                });
+            });
+        }
+
+        function loadRightColumn() {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newRightColumn = doc.querySelector('#rightcolumn');
+                    document.querySelector('#rightcolumn').innerHTML = newRightColumn.innerHTML;
+
+                    // Bind rating events again
+                    bindRatingEvents();
+                })
+                .catch(error => {
+                    console.error('Error loading right column:', error);
+                });
+        }
+    });
 </script>
 @endsection
