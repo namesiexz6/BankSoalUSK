@@ -1,14 +1,11 @@
-/* Existing CSS in komentarSoal.css */
-@import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap");
+
 body {
     margin: 0;
     padding: 0;
+    
 }
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
-}
+
 
 .leftcolumn {
     float: left;
@@ -27,104 +24,30 @@ body {
     .leftcolumn,
     .rightcolumn {
         width: 100%;
-        padding: 0;
     }
 }
- .row::before {
-            content: "";
-            display: table;
-            clear: both;
-        }
 
-        .leftcolumn {
-            float: left;
-            width: 70%;
-        }
-
-        .rightcolumn {
-            float: left;
-            width: 30%;
-            height: 100%;
-            padding-left: 10px;
-            padding-right: 20px;
-        }
-
-
-        @media screen and (max-width: 800px) {
-            .leftcolumn,
-            .rightcolumn {
-                width: 100%;
-                padding: 0;
-            }
-        }
 textarea {
     height: 30px;
     width: 100%;
     border: none;
     border-bottom: 2px solid #aaa;
     background-color: transparent;
-    margin-bottom: px;
-    resize: none;
     outline: none;
-    transition: .5s
+    transition: 0.5s;
 }
 
-.sidebar {
-    width: 250px;
-    margin-right: 20px;
+.sidebar,
+.content,
+.button-container,
+.post {
     background: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.content {
-    flex-grow: 1;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-right: 20px;
-}
-
-.post {
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
-    margin-top: 20px;
-}
-
-.post:first-child {
-    border-top: none;
-    padding-top: 0;
-    margin-top: 0;
-}
-
-.user {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.rating span {
-    color: #ffc107;
-}
-
-.rating a {
-    color: #007bff;
-    text-decoration: none;
-    margin-left: 10px;
-}
-
-.comment {
-    border-top: 1px solid #eee;
-    margin-top: 10px;
-    padding-top: 10px;
 }
 
 .button-container {
-    flex-grow: 1;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background: #fff;
     text-align: center;
 }
 
@@ -138,140 +61,51 @@ textarea {
 }
 
 .post {
-    margin-bottom: 20px;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #ddd;
+    margin-top: 10px;
+    padding-top: 20px;
 }
 
-.post-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.post:first-child {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
 }
 
-.post-header .user {
+.user {
     font-weight: bold;
+    
 }
 
-.post-header .rating {
-    color: #ffc107;
-}
-
-.post-content {
-    margin: 10px 0;
-    padding: 10px;
-    background: #f7f7f7;
-    border-radius: 8px;
-}
-
-.post-footer {
+.user-level {
+    margin-left: 5px;
+    margin-bottom: 8px;
+    color: gray;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-
-.rating {
-    display: flex;
-    align-items: center;
-}
-
 .rating span {
-    cursor: pointer;
-    font-size: 20px;
-    color: #ddd;
-}
-
-.rating span.selected,
-.rating span:hover,
-.rating span.hover {
+    font-weight: bolder;
     color: #ffc107;
 }
 
-.comment-button {
-    color: #007bff;
-    cursor: pointer;
-    text-decoration: none;
+.avg_rating span {
+    color: #ffc107;
     font-weight: bold;
 }
 
-.comments {
-    margin-top: 20px;
+.rating a {
+    color: #007bff;
+    text-decoration: none;
+    margin-left: 10px;
 }
 
 .comment {
+    border: 1px solid #c3c3c3;
     margin-top: 10px;
-    padding: 20px;
-    background: #f1f1f1;
-    border-radius: 8px;
-    margin-left: 20px; /* ชิดขวา */
-}
-
-.comment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.comment-header .user {
-    font-weight: bold;
-}
-
-.comment-header .rating {
-    color: #ffc107;
-}
-
-.comment-content {
-    margin: 10px 0;
-    padding: 10px;
-    background: #fff;
-    border-radius: 8px;
-}
-
-.comment-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.reply-button {
-    color: #007bff;
-    cursor: pointer;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-/* New styles from the HTML <style> tag */
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
-}
-
-.leftcolumn {
-    float: left;
-    width: 70%;
-}
-
-.rightcolumn {
-    float: left;
-    width: 30%;
-    height: 100%;
-    padding-left: 10px;
-    padding-right: 20px;
-}
-
-.card {
-    background-color: white;
-    padding: 20px;
-    margin-top: 20px;
-}
-
-input[type=text] {
-    border: none;
-    background-color: transparent;
-    border-bottom: 2px solid rgb(124, 122, 122);
+    padding-top: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .comment-box {
@@ -289,7 +123,6 @@ input[type=text] {
 }
 
 .file-upload {
-    
     cursor: pointer;
 }
 
@@ -299,18 +132,11 @@ input[type=text] {
     cursor: pointer;
 }
 
-
-.fa-image::before{
-    
-    color: #555;
-    font-size: 20px;
-}
-
+.fa-image::before,
 .fa-paper-plane {
-    font-size: 18px;
+    font-size: 20px;
     color: #555;
 }
-
 
 .image-preview {
     margin-top: 10px;
@@ -341,20 +167,13 @@ input[type=text] {
     cursor: pointer;
 }
 
-@media screen and (max-width: 800px) {
-    .leftcolumn,
-    .rightcolumn {
-        width: 100%;
-        padding: 0;
-    }
-}
-
 .comment-images {
     display: flex;
     flex-wrap: nowrap;
     gap: 10px;
     align-items: center;
     justify-content: flex-start;
+    margin-bottom: 10px;
 }
 
 .comment-images a,
@@ -364,9 +183,9 @@ input[type=text] {
 }
 
 .comment-images img {
-    width: 125px; /* Fixed width */
-    height: 125px; /* Fixed height */
-    object-fit: cover; /* Ensures image covers the area */
+    width: 125px;
+    height: 125px;
+    object-fit: cover;
     display: flex;
     border-radius: 4px;
     justify-content: center;
@@ -387,6 +206,82 @@ input[type=text] {
     border-radius: 4px;
 }
 
+.post-header,
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.post-content,
+.comment-content {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f7f7f7;
+    border-radius: 8px;
+}
+
+.post-footer,
+.comment-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+}
+
+.rating span {
+    cursor: pointer;
+    font-size: 20px;
+    color: #ddd;
+}
+
+.rating span.selected,
+.rating span:hover,
+.rating span.hover {
+    color: #ffc107;
+}
+
+.comment-button,
+.reply-button {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.comments {
+    margin-top: 20px;
+}
+
+.reply-form {
+    display: none;
+    margin-top: 10px;
+}
+
+.comment {
+    margin-top: 10px;
+    padding: 20px;
+    background: #e6e6e6;
+    border-radius: 8px;
+    margin-left: 20px;
+}
+
+.card {
+    background-color: white;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+input[type="text"] {
+    border: none;
+    background-color: transparent;
+    border-bottom: 2px solid rgb(124, 122, 122);
+}
+
 /* Popup Modal Styles */
 .modal {
     display: none;
@@ -397,9 +292,7 @@ input[type=text] {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.9);
-    
 }
 
 .modal-content-wrapper {
@@ -408,7 +301,6 @@ input[type=text] {
     align-items: center;
     height: 100%;
     width: 100%;
-    
 }
 
 .modal-content {
@@ -419,26 +311,23 @@ input[type=text] {
     width: auto;
     height: auto;
     object-fit: contain;
-    
-   
-}
-
-.modal-content, .close, .prev, .next {
     animation-name: zoom;
-    animation-duration: 0.6s;
+    animation-duration: 0.3s;
 }
-
-
 
 @keyframes zoom {
-    from {transform: scale(0)} 
-    to {transform: scale(1)}
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
 }
 
-.close {
+.close,
+.prev,
+.next {
     position: absolute;
-    top: 20px;
-    right: 20px;
     color: #f1f1f1;
     font-size: 40px;
     font-weight: bold;
@@ -446,30 +335,27 @@ input[type=text] {
     z-index: 1060;
 }
 
-.close:hover,
-.close:focus {
-    color: #bbb;
-    text-decoration: none;
-    cursor: pointer;
+.close {
+    top: 20px;
+    right: 20px;
 }
 
-.prev, .next {
-    cursor: pointer;
-    position: absolute;
+.prev,
+.next {
     top: 50%;
-    width: auto;
     padding: 16px;
     margin-top: -50px;
-    color: white;
-    font-weight: bold;
     font-size: 20px;
-    transition: 0.3s;
     user-select: none;
-    z-index: 1060;
 }
 
-.prev:hover, .next:hover {
-    background-color: rgba(0,0,0,0.8);
+.close:hover,
+.close:focus,
+.prev:hover,
+.next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #bbb;
+    cursor: pointer;
 }
 
 .prev {

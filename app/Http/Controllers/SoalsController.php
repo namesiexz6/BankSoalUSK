@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\File;
 use HtmlToRtf\HtmlToRtf;
 use Illuminate\Support\Facades\Log;
@@ -111,34 +112,38 @@ class SoalsController extends Controller
         $request->validate([
             'id_soal' => 'required|exists:soal,id',
             'isi_komentar' => 'required|string|max:255',
-            'file_komentar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'file_komentar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'parent_id' => 'nullable|exists:komentar_soal,id',
         ]);
-
-        // สร้างคอมเมนต์ใหม่
+    
         $komentar = new KomentarSoal();
         $komentar->id_soal = $request->id_soal;
         $komentar->id_user = Auth::id();
         $komentar->isi_komentar = $request->isi_komentar;
+        if ($request->filled('parent_id')) {
+            $komentar->parent_id = $request->parent_id;
+        }
         $komentar->save();
-
+    
         $images = [];
         if ($request->hasfile('file_komentar')) {
             $destinationPath = 'public/komentarSoal/' . $komentar->id_soal;
-            $i = 1; // เริ่มต้นตัวเลขลำดับจาก 1
+            $i = 1;
             foreach ($request->file('file_komentar') as $file) {
                 $filename = $komentar->id . '_' . $komentar->id_user . '_' . $i . '.' . $file->getClientOriginalExtension();
                 $file->storeAs($destinationPath, $filename);
                 $images[] = $filename;
-                $i++; // เพิ่มตัวเลขลำดับ
+                $i++;
             }
             $komentar->file_komentar = json_encode($images);
         }
-
+    
         $komentar->save();
-
-        // ส่งข้อมูลไปแสดงผลใน View
-        return response()->json(['success' => 'Comment added successfully with ' . count($images) . ' images']);
+    
+        return response()->json(['success' => true]);
     }
+    
+
 
     public function submitRating(Request $request)
     {
