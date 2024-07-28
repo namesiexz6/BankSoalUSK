@@ -83,30 +83,57 @@ class SoalsController extends Controller
     public function lihatsoal(Request $request)
     {
         $id_soal = $request->input("soals_id");
+            
+        if($id_soal == null){
+            $id_soal = session()->get("id_soal");
+        }
+        session()->put("id_soal", $id_soal);
+    
+        // รับพารามิเตอร์การเรียงลำดับจาก request
+        $sort = $request->input('sort', 'newest'); // ค่าเริ่มต้นคือ 'newest'
+    
+        // จัดการการเรียงลำดับตามพารามิเตอร์
+        if ($sort == 'newest') {
+            $komentar_soal = KomentarSoal::where("id_soal", $id_soal)->orderBy("created_at", "desc")->get();
+        } elseif ($sort == 'oldest') {
+            $komentar_soal = KomentarSoal::where("id_soal", $id_soal)->orderBy("created_at", "asc")->get();
+        } elseif ($sort == 'most_rated') {
+            $komentar_soal = KomentarSoal::where("id_soal", $id_soal)
+                ->leftJoin('rating_komentar', 'komentar_soal.id', '=', 'rating_komentar.id_komentar')
+                ->selectRaw('komentar_soal.*, COUNT(rating_komentar.id) as rating_count')
+                ->groupBy('komentar_soal.id', 'komentar_soal.id_soal', 'komentar_soal.id_user', 'komentar_soal.parent_id', 'komentar_soal.isi_komentar', 'komentar_soal.file_komentar', 'komentar_soal.created_at', 'komentar_soal.updated_at')
+                ->orderBy('rating_count', 'desc')
+                ->get();
+        }
+    
         $soal = Soal::where("id", $id_soal)->orderBy("id", "asc")->get();
-        $komentar_soal = KomentarSoal::where("id_soal", $id_soal)->orderBy("id", "asc")->get();
         $user_ids = $komentar_soal->pluck('id_user')->unique();
         $user = User::whereIn("id", $user_ids)->orderBy("id", "asc")->get()->keyBy('id');
-
+    
         $usernow = Auth::user();
-
+    
         $ratings = rating_komentar::where('id_user', $usernow->id)
             ->whereIn('id_komentar', $komentar_soal->pluck('id'))
             ->get()
             ->keyBy('id_komentar');
-
+    
         $ratingData = rating_komentar::selectRaw('id_komentar, AVG(rating) as avg_rating, COUNT(id) as rating_count')
             ->whereIn('id_komentar', $komentar_soal->pluck('id'))
             ->groupBy('id_komentar')
             ->get()
             ->keyBy('id_komentar');
-
+    
         $komentar_parents = $komentar_soal->whereNull('parent_id');
         $komentar_replies = $komentar_soal->whereNotNull('parent_id')->groupBy('parent_id');
-
-        return view("lihatsoal", compact('soal', 'komentar_parents', 'komentar_replies', 'user', 'usernow', 'ratings', 'ratingData'));
+    
+        if ($request->ajax()) {
+            return view('partials.comments', compact('komentar_parents', 'komentar_replies', 'user', 'ratings', 'ratingData', 'sort'))->render();
+        }
+    
+        return view("lihatsoal", compact('soal', 'komentar_parents', 'komentar_replies', 'user', 'usernow', 'ratings', 'ratingData', 'sort'));
     }
-
+    
+    
     public function komentar(Request $request)
     {
         $request->validate([
@@ -144,7 +171,6 @@ class SoalsController extends Controller
     }
     
 
-
     public function submitRating(Request $request)
     {
         $request->validate([
@@ -176,107 +202,49 @@ class SoalsController extends Controller
         ]);
     }
 
-    public function editmatakuliah($response, $request, $session)
+    public function deleteComment($id)
     {
-        $semester = $request->input("semester");
-        $cancel = $request->input("cancel");
+        $komentar = KomentarSoal::find($id);
 
-        if ($session->get("edit") == 1) {
-            if ($cancel == "2") {
-                return $response->redirect("/semester?semester=" . $semester);
-            } else {
-                $kode_mk = $request->input("kode");
-                $nama_mk = $request->input("nama");
-                $sks = $request->input("sks");
+        if ($komentar) {
+            // ลบเรตติ้งของคอมเม้น
+            rating_komentar::where('id_komentar', $id)->delete();
 
-                if (!$kode_mk) {
-                    $session->flash('error', 'Error! KodeMata Kuliah tidak boleh kosong!');
-                    return $response->redirect("/semester?semester=" . $semester);
-                }
-                if (!$nama_mk) {
-                    $session->flash('error', 'Error! Nama Mata Kuliah tidak boleh kosong!');
-                    return $response->redirect("/semester?semester=" . $semester);
-                }
-                if (!$sks) {
-                    $session->flash('error', 'Error! SKS tidak boleh kosong!');
-                    return $response->redirect("/semester?semester=" . $semester);
-                }
+            // ค้นหาคอมเม้นลูกทั้งหมด
+            $childComments = KomentarSoal::where('parent_id', $id)->get();
 
-                Matakuliah::create([
-                    'id_semester' => $semester,
-                    'kode' => $kode_mk,
-                    'nama' => $nama_mk,
-                    'sks' => $sks,
-                ]);
-
-                return $response->redirect("/semester?semester=" . $semester);
+            // ลบคอมเม้นลูกทั้งหมด
+            foreach ($childComments as $childComment) {
+                rating_komentar::where('id_komentar', $childComment->id)->delete();
+                $this->deleteCommentFiles($childComment);
+                $childComment->delete();
             }
-        } elseif ($session->get("edit") == 3) {
-            if ($cancel == "2") {
-                return $response->redirect("/semester?semester=" . $semester);
-            }
-            $id = $request->input("hapus");
-            $soal = Soal::where("id_mk", $id)->orderBy("id", "asc")->get();
-            KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
-            Soal::where("id_mk", $id)->delete();
-            Matakuliah::where("id", $id)->delete();
 
-            return $response->redirect("/semester?semester=" . $semester);
+            // ลบไฟล์ภาพของคอมเม้นหลัก
+            $this->deleteCommentFiles($komentar);
+
+            // ลบคอมเม้นหลัก
+            $komentar->delete();
+
+            return response()->json(['success' => true]);
         } else {
-            $session->put("matakuliah_id", $request->input("update"));
-
-            if ($cancel == "2") {
-                $session->put("matakuliah_id", -1);
-                return $response->redirect("/semester?semester=" . $semester);
-            } elseif ($cancel == "3") {
-                $id = $request->input("update");
-                $kode_mk = $request->input("kode");
-                $nama_mk = $request->input("nama");
-                $sks = $request->input("sks");
-
-                if (!$kode_mk) {
-                    $session->flash('error', 'Error! Kode Mata Kuliah tidak boleh kosong!');
-                    return $response->redirect("/semester?semester=" . $semester);
-                }
-                if (!$nama_mk) {
-                    $session->flash('error', 'Error! Nama Mata Kuliah tidak boleh kosong!');
-                    return $response->redirect("/semester?semester=" . $semester);
-                }
-                if (!$sks) {
-                    $session->flash('error', 'Error! SKS tidak boleh kosong!');
-                    return $response->redirect("/semester?semester=" . $semester);
-                }
-
-                Matakuliah::where("id", $id)->update([
-                    'id_semester' => $semester,
-                    'kode' => $kode_mk,
-                    'nama' => $nama_mk,
-                    'sks' => $sks,
-                ]);
-
-                $session->put("matakuliah_id", -1);
-                return $response->redirect("/semester?semester=" . $semester);
-            }
-
-            return $response->redirect("/semester?semester=" . $semester . "&edit=2");
+            return response()->json(['success' => false, 'message' => 'Comment not found']);
         }
     }
 
-    public function editsoal(Request $request)
+    private function deleteCommentFiles($komentar)
     {
-        $id_matakuliah = $request->input("matakuliah_id");
-        $cancel = $request->input("cancel");
-
-        if (session()->get("edit") == 3) {
-            if ($cancel == "2") {
-                return redirect("/soal?matakuliah_id=" . $id_matakuliah);
+        if ($komentar->file_komentar) {
+            $images = json_decode($komentar->file_komentar);
+            foreach ($images as $image) {
+                $path = 'public/komentarSoal/' . $komentar->id_soal . '/' . $image;
+                if (Storage::exists($path)) {
+                    Storage::delete($path);
+                }
             }
-            $id = $request->input("hapus");
-
-            KomentarSoal::where("id_soal", $id)->delete();
-            Soal::where("id", $id)->delete();
-
-            return redirect("/soal?matakuliah_id=" . $id_matakuliah);
         }
     }
+  
+    
+    
 }

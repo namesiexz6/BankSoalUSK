@@ -2,8 +2,34 @@
 @section('body')
 <!DOCTYPE html>
 <html>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+้
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .nav-link {
+            font-size: 18px;
+            /* ขนาดของฟอนต์ */
+        }
+
+        .navbar-brand img {
+            width: 120px;
+            /* ขนาดโลโก้ */
+        }
+
+        /* กำหนดสไตล์เฉพาะให้กับส่วน Sidebar */
+        .w3-sidebar .w3-bar-item {
+            font-size: 16px;
+            /* ขนาดของฟอนต์ใน Sidebar */
+        }
+    </style>
+</head>
+
 
 <body>
 
@@ -18,7 +44,7 @@
         <a href="/manageJenjang" class="w3-bar-item w3-button">Manage Janjang</a>
     </div>
 
-    
+
     @yield('content')
 </body>
 

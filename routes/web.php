@@ -40,6 +40,8 @@ Route::post("/soal", [SoalsController::class, 'showsoal'])->name("pilihsoal");
 Route::get("/lihatsoal", [SoalsController::class, 'lihatsoal'])->name("tamplikanhHsoal");
 Route::post("/lihatsoal", [SoalsController::class, 'lihatsoal'])->name("pilihHsoal");
 Route::post("/komentar", [SoalsController::class, 'komentar']);
+Route::delete('/komentar/{id}', [SoalsController::class, 'deleteComment'])->name('komentar.delete');
+
 
 
     Route::post("/logout", [AuthController::class, 'logout'])->name("logout");

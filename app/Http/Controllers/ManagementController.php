@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Fakultas;
 use App\Models\Jenjang;
 use App\Models\Prodi;
+use App\Models\rating_komentar;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Semester;
 use App\Models\Matakuliah;
 use Illuminate\Http\Request;
@@ -83,84 +85,121 @@ class ManagementController extends Controller
             multi_mk::create([
                 'id_mk' => $matakuliah->id,
                 'id_semester' => $semester,
-              
+
             ]);
         }
 
         return redirect("/manageMatakuliah");
     }
     public function jenjangM(Request $request)
-    {
-        $jenjang = $request->input("edit");
-        if ($jenjang == 2) {
-            $id = $request->input("jenjang_id");
-            $fakultas = Fakultas::where("id_jenjang", $id)->orderBy("id", "asc")->get();
-            $prodi = Prodi::whereIn("id_fakultas", $fakultas->pluck('id')->toArray())->orderBy("id", "asc")->get();
-            $semester = Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->orderBy("id", "asc")->get();
-            $multi_mk = multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id_mk", "asc")->get();
-            $mk = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
-            $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
-            KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
-            Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
-            multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
-            Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->delete();
-            Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->delete();
-            Prodi::whereIn("id_fakultas", $fakultas->pluck('id')->toArray())->delete();
-            Fakultas::where("id_jenjang", $id)->delete();
-            Jenjang::where("id", $id)->delete();
-            return redirect("/manageJenjang");
-        } elseif ($jenjang == 1) {
-            $id = $request->input("jenjang_id");
-            $nama = $request->input("nama_jenjang");
-            //dd($nama);
-            Jenjang::where('id', $id)->update([
-                'nama' => $nama,
+{
+    $jenjang = $request->input("edit");
+    if ($jenjang == 2) {
+        $id = $request->input("jenjang_id");
+        $fakultas = Fakultas::where("id_jenjang", $id)->orderBy("id", "asc")->get();
+        $prodi = Prodi::whereIn("id_fakultas", $fakultas->pluck('id')->toArray())->orderBy("id", "asc")->get();
+        $semester = Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->orderBy("id", "asc")->get();
+        $multi_mk = multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id_mk", "asc")->get();
+        $mk = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
+        $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
 
-            ]);
-            return redirect('/manageJenjang');
-        } else {
-
-            return redirect("/management");
+        // ลบไฟล์รูปภาพของคอมเม้นที่เกี่ยวข้อง
+        $komentar = KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->get();
+        foreach ($komentar as $kmt) {
+            if ($kmt->file_komentar) {
+                $images = json_decode($kmt->file_komentar);
+                foreach ($images as $image) {
+                    Storage::delete('public/komentarSoal/' . $kmt->id_soal . '/' . $image);
+                }
+            }
         }
+
+        // ลบเรตติ้งของคอมเม้นที่เกี่ยวข้อง
+        $komentar_ids = $komentar->pluck('id');
+        rating_komentar::whereIn('id_komentar', $komentar_ids)->delete();
+
+        // ลบคอมเม้นที่เกี่ยวข้อง
+        KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
+
+        // ลบคำถาม
+        Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
+
+        // ลบ multi_mk, Matakuliah, Semester, Prodi, Fakultas และ Jenjang
+        multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
+        Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->delete();
+        Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->delete();
+        Prodi::whereIn("id_fakultas", $fakultas->pluck('id')->toArray())->delete();
+        Fakultas::where("id_jenjang", $id)->delete();
+        Jenjang::where("id", $id)->delete();
+
+        return redirect("/manageJenjang");
+    } elseif ($jenjang == 1) {
+        $id = $request->input("jenjang_id");
+        $nama = $request->input("nama_jenjang");
+        Jenjang::where('id', $id)->update([
+            'nama' => $nama,
+        ]);
+        return redirect('/manageJenjang');
+    } else {
+        return redirect("/management");
     }
+}
 
-    public function fakultasM(Request $request)
-    {
-        $fakultas = $request->input("edit");
-        if ($fakultas == 2) {
-            $id = $request->input("fakultas_id");
-            $prodi = Prodi::where("id_fakultas", $id)->orderBy("id", "asc")->get();
-            $semester = Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->orderBy("id", "asc")->get();
-            $multi_mk = multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id_mk", "asc")->get();
-            $mk = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
-            $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
-            KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
-            Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
-            multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
-            Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->delete();
-            Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->delete();
-            Prodi::where("id_fakultas", $id)->delete();
-            Fakultas::where("id", $id)->delete();
-            return redirect("/manageFakultas");
-        } elseif ($fakultas == 1) {
-            $id = $request->input("fakultas_id");
-            $id_jenjang = $request->input("jenjang2");
-            $nama = $request->input("nama_fakultas");
-            //dd($nama);
-            Fakultas::where('id', $id)->update([
-                'id_jenjang' => $id_jenjang,
-                'nama' => $nama,
-            ]);
-            return redirect('/manageFakultas');
-        } else {
+public function fakultasM(Request $request)
+{
+    $fakultas = $request->input("edit");
+    if ($fakultas == 2) {
+        $id = $request->input("fakultas_id");
+        $prodi = Prodi::where("id_fakultas", $id)->orderBy("id", "asc")->get();
+        $semester = Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->orderBy("id", "asc")->get();
+        $multi_mk = multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id_mk", "asc")->get();
+        $mk = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
+        $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
 
-            return redirect("/management");
+        // ลบไฟล์รูปภาพของคอมเม้นที่เกี่ยวข้อง
+        $komentar = KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->get();
+        foreach ($komentar as $kmt) {
+            if ($kmt->file_komentar) {
+                $images = json_decode($kmt->file_komentar);
+                foreach ($images as $image) {
+                    Storage::delete('public/komentarSoal/' . $kmt->id_soal . '/' . $image);
+                }
+            }
         }
-    }
 
+        // ลบเรตติ้งของคอมเม้นที่เกี่ยวข้อง
+        $komentar_ids = $komentar->pluck('id');
+        rating_komentar::whereIn('id_komentar', $komentar_ids)->delete();
+
+        // ลบคอมเม้นที่เกี่ยวข้อง
+        KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
+
+        // ลบคำถาม
+        Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
+
+        // ลบ multi_mk, Matakuliah, Semester, Prodi และ Fakultas
+        multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
+        Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->delete();
+        Semester::whereIn("id_prodi", $prodi->pluck('id')->toArray())->delete();
+        Prodi::where("id_fakultas", $id)->delete();
+        Fakultas::where("id", $id)->delete();
+
+        return redirect("/manageFakultas");
+    } elseif ($fakultas == 1) {
+        $id = $request->input("fakultas_id");
+        $id_jenjang = $request->input("jenjang2");
+        $nama = $request->input("nama_fakultas");
+        Fakultas::where('id', $id)->update([
+            'id_jenjang' => $id_jenjang,
+            'nama' => $nama,
+        ]);
+        return redirect('/manageFakultas');
+    } else {
+        return redirect("/management");
+    }
+}
     public function prodiM(Request $request)
     {
-
         $prodi = $request->input("edit");
         if ($prodi == 2) {
             $id = $request->input("prodi_id");
@@ -168,8 +207,29 @@ class ManagementController extends Controller
             $multi_mk = multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->orderBy("id_mk", "asc")->get();
             $mk = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
             $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
+
+            // ลบไฟล์รูปภาพของคอมเม้นที่เกี่ยวข้อง
+            $komentar = KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->get();
+            foreach ($komentar as $kmt) {
+                if ($kmt->file_komentar) {
+                    $images = json_decode($kmt->file_komentar);
+                    foreach ($images as $image) {
+                        Storage::delete('public/komentarSoal/' . $kmt->id_soal . '/' . $image);
+                    }
+                }
+            }
+
+            // ลบเรตติ้งของคอมเม้นที่เกี่ยวข้อง
+            $komentar_ids = $komentar->pluck('id');
+            rating_komentar::whereIn('id_komentar', $komentar_ids)->delete();
+
+            // ลบคอมเม้นที่เกี่ยวข้อง
             KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
+
+            // ลบคำถาม
             Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
+
+            // ลบ multi_mk, Matakuliah, Semester, และ Prodi
             multi_mk::whereIn("id_semester", $semester->pluck('id')->toArray())->delete();
             Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->delete();
             Semester::where("id_prodi", $id)->delete();
@@ -180,49 +240,62 @@ class ManagementController extends Controller
             $id = $request->input("prodi_id");
             $id_fakultas = $request->input("fakultas2");
             $nama = $request->input("nama_prodi");
-            //dd($nama);
             Prodi::where('id', $id)->update([
                 'id_fakultas' => $id_fakultas,
                 'nama' => $nama,
             ]);
             return redirect('/manageProdi');
         } else {
-
             return redirect("/management");
         }
     }
-
     public function semesterM(Request $request)
     {
-
         $semester = $request->input("edit");
 
         if ($semester == 2) {
-
             $id = $request->input("semester_id");
             $multi_mk = multi_mk::where("id_semester", $id)->orderBy("id_mk", "asc")->get();
             $mk = Matakuliah::where("id", $multi_mk)->orderBy("id", "asc")->get();
             $soal = Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->orderBy("id", "asc")->get();
+
+            // ลบไฟล์รูปภาพของคอมเม้นที่เกี่ยวข้อง
+            $komentar = KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->get();
+            foreach ($komentar as $kmt) {
+                if ($kmt->file_komentar) {
+                    $images = json_decode($kmt->file_komentar);
+                    foreach ($images as $image) {
+                        Storage::delete('public/komentarSoal/' . $kmt->id_soal . '/' . $image);
+                    }
+                }
+            }
+
+            // ลบเรตติ้งของคอมเม้นที่เกี่ยวข้อง
+            $komentar_ids = $komentar->pluck('id');
+            rating_komentar::whereIn('id_komentar', $komentar_ids)->delete();
+
+            // ลบคอมเม้นที่เกี่ยวข้อง
             KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
+
+            // ลบคำถาม
             Soal::whereIn("id_mk", $mk->pluck('id')->toArray())->delete();
+
+            // ลบ multi_mk และ Matakuliah
             multi_mk::where("id_semester", $id)->delete();
             Matakuliah::where("id", $multi_mk)->delete();
             Semester::where("id", $id)->delete();
-
 
             return redirect("/manageSemester");
         } elseif ($semester == 1) {
             $id = $request->input("semester_id");
             $id_prodi = $request->input("prodi2");
             $nama = $request->input("nama_semester");
-            //dd($nama);
             Semester::where('id', $id)->update([
                 'id_prodi' => $id_prodi,
                 'nama' => $nama,
             ]);
             return redirect('/manageSemester');
         } else {
-
             return redirect("/management");
         }
     }
@@ -232,16 +305,36 @@ class ManagementController extends Controller
         $matakuliah = $request->input("edit");
 
         if ($matakuliah == 2) {
-
             $id = $request->input("matakuliah_id");
             $soal = Soal::where("id_mk", $id)->orderBy("id", "asc")->get();
+
+            // ลบไฟล์รูปภาพของคอมเม้นที่เกี่ยวข้อง
+            $komentar = KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->get();
+            foreach ($komentar as $kmt) {
+                if ($kmt->file_komentar) {
+                    $images = json_decode($kmt->file_komentar);
+                    foreach ($images as $image) {
+                        Storage::delete('public/komentarSoal/' . $kmt->id_soal . '/' . $image);
+                    }
+                }
+            }
+
+            // ลบเรตติ้งของคอมเม้นที่เกี่ยวข้อง
+            $komentar_ids = $komentar->pluck('id');
+            rating_komentar::whereIn('id_komentar', $komentar_ids)->delete();
+
+            // ลบคอมเม้นที่เกี่ยวข้อง
             KomentarSoal::whereIn("id_soal", $soal->pluck('id')->toArray())->delete();
+
+            // ลบคำถาม
             Soal::where("id_mk", $id)->delete();
+
+            // ลบ multi_mk และ Matakuliah
             multi_mk::where("id_mk", $id)->delete();
             Matakuliah::where("id", $id)->delete();
 
             return redirect("/manageMatakuliah");
-        }elseif($matakuliah == 1){
+        } elseif ($matakuliah == 1) {
             $id = $request->input("matakuliah_id");
             $kode = $request->input("kode");
             $nama = $request->input("nama");
@@ -260,32 +353,46 @@ class ManagementController extends Controller
                 ]);
             }
             return redirect('/manageMatakuliah');
-        }
-        else {
-
+        } else {
             return redirect("/management");
         }
     }
-
     public function soalM(Request $request)
     {
-
         $soal = $request->input("edit");
 
         if ($soal == 2) {
-
             $id = $request->input("soal_id");
+
+            // ดึงข้อมูลคอมเม้นที่เกี่ยวข้อง
+            $komentar = KomentarSoal::where("id_soal", $id)->get();
+
+            // ลบไฟล์รูปภาพที่เกี่ยวข้อง
+            foreach ($komentar as $kmt) {
+                if ($kmt->file_komentar) {
+                    $images = json_decode($kmt->file_komentar);
+                    foreach ($images as $image) {
+                        Storage::delete('public/komentarSoal/' . $id . '/' . $image);
+                    }
+                }
+            }
+
+            // ลบเรตติ้งของคอมเม้นที่เกี่ยวข้อง
+            $komentar_ids = $komentar->pluck('id');
+            rating_komentar::whereIn('id_komentar', $komentar_ids)->delete();
+
+            // ลบคอมเม้นที่เกี่ยวข้อง
             KomentarSoal::where("id_soal", $id)->delete();
+
+            // ลบคำถาม
             Soal::where("id", $id)->delete();
 
             return redirect("/manageSoal");
         } elseif ($soal == 1) {
             $id = $request->input("soal_id");
 
-
             return redirect('/manageSoal');
         } else {
-
             return redirect("/management");
         }
     }
@@ -500,7 +607,7 @@ class ManagementController extends Controller
 
     public function cariMatakuliahM2(Request $request)
     {
-        
+
 
         $data['multi_mk'] = multi_mk::where("id_semester", $request->id_semester)
             ->get(["id_mk"]);
