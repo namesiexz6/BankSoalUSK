@@ -19,9 +19,13 @@
             width: 120px;
             /* ขนาดโลโก้ */
         }
+        .delete-button.disabled {
+        cursor: not-allowed;
+        color: grey;
+    }
     </style>
 </head>
-
+<div>
 <div class="leftcolumn">
     <div class="card">
         @foreach ($soal as $soals)
@@ -118,7 +122,11 @@
                         @endfor
                 </div>
                 <div class="comment-button" onclick="showReplyForm({{ $komentar->id }})">Balas</div>
+                @if(auth()->check() && auth()->user()->level == 1 || auth()->user()->id == $komentar->id_user)
                 <div class="delete-button" onclick="deleteComment({{ $komentar->id }})">Delete</div>
+                @else
+                <div class="delete-button disabled">Delete</div>
+                @endif
             </div>
             <div class="reply-form" id="reply-form-{{ $komentar->id }}">
                 <form action="/komentar" method="post" enctype="multipart/form-data" class="reply-comment-form" id="reply-comment-form-{{ $komentar->id }}">
@@ -195,7 +203,11 @@
                         @for ($i = 1; $i <= 5; $i++) <span data-rating="{{ $i }}" class="{{ isset($ratings[$reply->id]) && $ratings[$reply->id]->rating >= $i ? 'selected' : '' }}">★</span>
                             @endfor
                     </div>
+                    @if(auth()->check() && auth()->user()->level == 1)
                     <div class="delete-button" onclick="deleteComment({{ $reply->id }})">Delete</div>
+                    @else
+                    <div class="delete-button disabled">Delete</div>
+                    @endif
                 </div>
             </div>
             @endforeach
@@ -214,7 +226,7 @@
         <img class="modal-content" id="modalImage">
     </div>
 </div>
-
+</div>
 <script>
     let imageFiles = [];
 

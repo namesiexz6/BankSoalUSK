@@ -22,24 +22,22 @@ class SoalsController extends Controller
     {
         $isi_soal = $request->file("formFile");
         $isi_soaltext = $request->input("textareaContent");
-
+    
         $id_mk = $request->input("matakuliah2");
         $nama_soal = $request->input("nama_soal");
         $nama = auth()->user()->nama;
-
-        if (!$isi_soal) {
-            if (!$isi_soaltext) {
-                return redirect("/manageSoal");
+    
+        if ($isi_soal) {
+            // Check if the file size exceeds 5MB
+            $maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+            if ($isi_soal->getSize() > $maxFileSize) {
+                return redirect()->back()->with('error', 'File size exceeds 5MB.');
             }
-
-            if (!Storage::disk('public')->exists('html')) {
-                Storage::disk('public')->makeDirectory('html');
-            }
-            $tipe = 2;
-            $fileName = time() . '_' . $nama_soal . '_' . $nama . '.html';
-            Storage::disk('public')->put('html/' . $fileName, $isi_soaltext);
-
-
+    
+            $fileName = time() . '_' . $isi_soal->getClientOriginalName();
+            $isi_soal->storeAs('pdf', $fileName, 'public');
+    
+            $tipe = 1;
             Soal::create([
                 'nama' => $nama,
                 'id_mk' => $id_mk,
@@ -47,24 +45,32 @@ class SoalsController extends Controller
                 'tipe' => $tipe,
                 'isi_soal' => $fileName
             ]);
+    
+            return redirect("/manageSoal");
+        } else {
+            if (!$isi_soaltext) {
+                return redirect("/manageSoal");
+            }
+    
+            if (!Storage::disk('public')->exists('html')) {
+                Storage::disk('public')->makeDirectory('html');
+            }
+            $tipe = 2;
+            $fileName = time() . '_' . $nama_soal . '_' . $nama . '.html';
+            Storage::disk('public')->put('html/' . $fileName, $isi_soaltext);
+    
+            Soal::create([
+                'nama' => $nama,
+                'id_mk' => $id_mk,
+                'nama_soal' => $nama_soal,
+                'tipe' => $tipe,
+                'isi_soal' => $fileName
+            ]);
+    
             return redirect("/manageSoal");
         }
-
-        $fileName = time() . '_' . $isi_soal->getClientOriginalName();
-        $isi_soal->storeAs('pdf', $fileName, 'public');
-
-        $tipe = 1;
-        Soal::create([
-            'nama' => $nama,
-            'id_mk' => $id_mk,
-            'nama_soal' => $nama_soal,
-            'tipe' => $tipe,
-            'isi_soal' => $fileName
-
-        ]);
-        return redirect("/manageSoal");
     }
-
+    
 
     public function showsoal(Request $request)
     {

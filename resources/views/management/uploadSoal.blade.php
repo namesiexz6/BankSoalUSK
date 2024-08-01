@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/popupform.css">
+   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.1.1/tinymce.min.js" integrity="sha512-bAtLCmEwg+N9nr6iVELr/SlDxBlyoF0iVdPxAvcOCfUiyi6RcuS6Lzawi78iPbAfbNyIUftvwK9HPWd+3p975Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <title>TinyMCE to HTML</title>
+    <link rel="stylesheet" href="/css/popupform.css">
+    <title>Upload Soal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,13 +31,11 @@
 
     <div class="w3-container">
         <div class="container">
-            <form action="{{ route('tambahSoalM') }}" method="post" enctype="multipart/form-data">
+            <form id="uploadForm" action="{{ route('tambahSoalM') }}" method="post" enctype="multipart/form-data">
 
                 <div class="row">
 
                     <div class="col-md-3">
-
-
                         @csrf
                         <h1>Tambah Mata kuliah</h1>
 
@@ -46,21 +45,20 @@
                     <div class="col-md-3">
                         <div id="fileOptions" class="tab">
                             <button class="tablinks active" onclick="toggleFileOption(event, 'upload')">Upload File</button>
-                            <button class="tablinks" onclick="toggleFileOption(event, 'textarea')">Textarea</button>
+                            <button class="tablinks" onclick="toggleFileOption(event, 'textarea')">Text Editor</button>
                         </div>
-
 
                         <!-- input file และ textarea -->
                         <div id="upload" class="tabcontent" style="display: block;">
                             <label class="form-label mt-3">Pilih File:</label>
-                            <input class="form-control" type="file" name="formFile" id="formFile" >
+                            <input class="form-control" type="file" name="formFile" id="formFile" accept=".pdf">
                         </div>
                         <div id="textarea" class="tabcontent" style="display: none;">
-                            <textarea class="form-control" id="textareaContent" name="textareaContent" ></textarea>
+                            <textarea class="form-control" id="textareaContent" name="textareaContent"></textarea>
                         </div>
                     </div>
                     <div class="col-md-3"><br>
-                        <label for="jenjang2" class="form-label  mt-3">Pilih alamat:</label> <br>
+                        <label for="jenjang2" class="form-label mt-3">Pilih alamat:</label> <br>
                         <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2">
                             <option value="">-- Pilih Janjang --</option>
                             @foreach ($jenjang as $jj)
@@ -95,13 +93,9 @@
                     <button class="buttonadd mt-3" id="submitButton" type="submit">Submit</button>
                     <button class="buttoncancel mt-3" type="button" id="backButton">Batal</button>
                 </div>
+            </form>
         </div>
-        </form>
     </div>
-
-    </div>
-
-
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
@@ -111,10 +105,47 @@
                 window.history.back();
             }
         });
-        document.getElementById('submitButton').addEventListener('click', function() {
-            var confirmed = confirm('Are you sure you want to submit?');
-            if (confirmed) {
-                document.getElementById('submitButton').submit();
+
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            var fileInput = document.getElementById('formFile');
+            var textareaContent = tinymce.get("textareaContent").getContent();
+            var file = fileInput.files[0];
+            var maxSize = 5 * 1024 * 1024; // 5MB in bytes
+
+            // Check if neither file nor textarea is filled
+            if (!file && !textareaContent.trim()) {
+                alert('Please upload a file or enter text in the editor.');
+                event.preventDefault();
+                return;
+            }
+
+            if (file) {
+                if (file.size > maxSize) {
+                    alert('File size exceeds 5MB. Please upload a smaller file.');
+                    event.preventDefault();
+                    return;
+                }
+
+                var fileReader = new FileReader();
+                fileReader.onload = function(e) {
+                    var fileContent = e.target.result;
+
+                    if (fileContent.trim().length === 0) {
+                        alert('File is empty. Please upload a valid PDF file.');
+                        event.preventDefault();
+                    } else {
+                        document.getElementById('uploadForm').submit();
+                    }
+                };
+                fileReader.readAsText(file);
+
+                event.preventDefault();
+            } else {
+                // If no file, check textarea content
+                if (textareaContent.trim().length === 0) {
+                    alert('The text editor content is empty. Please enter some text.');
+                    event.preventDefault();
+                }
             }
         });
     </script>
@@ -135,7 +166,7 @@
                 popupMessage = "You have an uploaded file. Are you sure you want to switch and discard the file?";
             } else if (optionName === "upload" && textareaContent.trim() !== "") {
                 showPopup = true;
-                popupMessage = "You have content in the textarea. Are you sure you want to switch and discard the content?";
+                popupMessage = "You have content in the Editor. Are you sure you want to switch and discard the content?";
             }
 
             if (showPopup) {
@@ -255,8 +286,6 @@
                     }
                 });
             });
-
-
         });
     </script>
     <script>

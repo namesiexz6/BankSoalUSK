@@ -4,13 +4,25 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/css/popupform.css">
+    <style>
+        h1 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+        h2 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+    </style>
 </head>
 
 
 <div style="margin-left:15%">
 
     <div class="w3-container w3-light-blue">
-        <h1>Manage Matakuliah</h1>
+        <h1>Manajemen Matakuliah</h1>
     </div>
 
     <div class="w3-container">
@@ -93,7 +105,7 @@
                     <td>
                         <div class="d-flex">
                         <button type="submit" name="edit" class="btn btn-info text-light" style="margin-right: 1ch; background-color: blue;" onclick="openRegisterFormEdit('{{ $matakuliahs->id }}','{{ $matakuliahs->kode }}','{{ $matakuliahs->nama }}','{{ $matakuliahs->sks }}','{{ $matakuliahs->id_semester }}')">Edit</button>
-                        <form action="{{ route('matakuliahM')}}" method="post">
+                        <form action="{{ route('matakuliahM')}}" method="post"onsubmit="return confirmDelete()">
                             @csrf
 
                             <input type="hidden" name="matakuliah_id" value="{{ $matakuliahs->id }}">
@@ -220,6 +232,9 @@
 
     function closeRegisterFormEdit() {
         document.getElementById("registerFormEdit").style.display = "none";
+    }
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this item?');
     }
 </script>
 

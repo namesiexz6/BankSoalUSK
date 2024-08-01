@@ -4,11 +4,23 @@
 <head>
 
     <link rel="stylesheet" href="/css/popupform.css">
+    <style>
+        h1 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+        h2 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+    </style>
 </head>
 <div style="margin-left:15%">
 
     <div class="w3-container w3-light-blue">
-        <h1>Manage Semester</h1>
+        <h1>Manajemen Semester</h1>
     </div>
 
     <div class="w3-container">
@@ -79,9 +91,9 @@
                         <div class="d-flex">
 
                             <button type="submit" name="edit" class="btn btn-info text-light" style="margin-right: 1ch; background-color: blue;" onclick="openRegisterFormEdit('{{ $s->id }}','{{ $s->nama }}','{{ $s->id_prodi }}')">Edit</button>
-                            <form action="{{ route('semesterM')}}" method="post">
+                            <form action="{{ route('semesterM')}}" method="post"onsubmit="return confirmDelete()">
                                 @csrf
-                                <input type="hidden" name="semester_id" value="{{ $s->id }}">
+                                <input type="hidden" name="semester_id" value="{{ $s->id }}" >
                                 <button type="submit" name="edit" value="2" class="btn btn-info text-light" style="background-color: red;">Hapus</button>
                             </form>
                         </div>
@@ -269,6 +281,9 @@
 
     function closeRegisterFormEdit() {
         document.getElementById("registerFormEdit").style.display = "none";
+    }
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this item?');
     }
    
 </script>

@@ -4,11 +4,23 @@
 <head>
 
     <link rel="stylesheet" href="/css/popupform.css">
+    <style>
+        h1 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+        h2 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+    </style>
 </head>
 <div style="margin-left:15%">
 
     <div class="w3-container w3-light-blue">
-        <h1>Manage Janjang</h1>
+        <h1>Manajemen Janjang</h1>
     </div>
 
     <div style="margin-left:10px; margin-right:10px;">
@@ -38,7 +50,7 @@
                         <div class="d-flex">
 
                             <button type="submit" name="edit" value="{{ $j->id }}" class="btn btn-info text-light" style="margin-right: 1ch; background-color: blue;" onclick="openRegisterFormEdit('{{ $j->id }}','{{ $j->nama }}')">Edit</button>
-                            <form action="{{ route('jenjangM')}}" method="post">
+                            <form action="{{ route('jenjangM')}}" method="post"  onsubmit="return confirmDelete()">
                                 @csrf
                                 <input type="hidden" name="jenjang_id" value="{{ $j->id }}">
                                 <button type="submit" name="edit" value="2" class="btn btn-info text-light" style="background-color: red;">Hapus</button>
@@ -54,7 +66,7 @@
             </tbody>
         </table>
 
-        <button class="buttonadd mt-3" type="button" id="adressBTN" onclick="openRegisterForm()">Tambah Fakultas</button>
+        <button class="buttonadd mt-3" type="button" id="adressBTN" onclick="openRegisterForm()">Tambah Janjang</button>
     </div>
 
     <div id="registerForm" class="register-form">
@@ -64,7 +76,7 @@
             @csrf
             <h1>Tambah Janjang</h1>
             <label class="form-label mt-3">Nama Janjang:</label>
-            <input class="form-control" name="nama_jenjang" id="nama_jenjang" type="text" placeholder="MIPA" required>
+            <input class="form-control" name="nama_jenjang" id="nama_jenjang" type="text" placeholder="ex: S1" required>
 
             <button type="submit" class="registerbtn">Submit</button>
             <button class="buttoncancel mt-3" type="button" id="adressBTN" onclick="closeRegisterForm()">Batal</button>
@@ -98,14 +110,6 @@
         document.getElementById("registerForm").style.display = "none";
     }
 
-    // ปิดฟอร์มเมื่อคลิกนอกพื้นที่ของป๊อปอัพ
-    window.onclick = function(event) {
-        var registerForm = document.getElementById("registerForm");
-        if (event.target == registerForm) {
-            registerForm.style.display = "none";
-        }
-    }
-
     function openRegisterFormEdit(id,   nama) {
         var form = document.getElementById("registerFormEdit");
         var jenjangIdInput = form.querySelector("input[name='jenjang_id'");
@@ -118,13 +122,10 @@
     function closeRegisterFormEdit() {
         document.getElementById("registerFormEdit").style.display = "none";
     }
-    // ปิดฟอร์มเมื่อคลิกนอกพื้นที่ของป๊อปอัพ
-    window.onclick = function(event) {
-        var registerFormEdit = document.getElementById("registerFormEdit");
-        if (event.target == registerFormEdit) {
-            registerFormEdit.style.display = "none";
-        }
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this item?');
     }
+  
 </script>
 
 @endsection

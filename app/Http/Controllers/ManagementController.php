@@ -638,7 +638,7 @@ public function fakultasM(Request $request)
         $data['matakuliah'] = Matakuliah::get(["nama", "id"]);
         $data['multi_mk'] = multi_mk::get(["id_mk", "id_semester"]);
         $data['soal'] = Soal::get(["nama", "id"]);
-
+        
 
 
         session()->put("Manage_id", 0);

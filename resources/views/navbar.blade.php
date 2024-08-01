@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
         .nav-link {
             font-size: 18px; /* ขนาดของฟอนต์ */
@@ -40,8 +40,13 @@
                         <a class="nav-link fw-bold" style="color: #134F5C" href="/search">Soal</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link fw-bold" style="color: #134F5C" aria-current="page" href="/thread">Thread</a>
+                    </li>
+                    @if(auth()->check() && auth()->user()->level == 1)
+                    <li class="nav-item">
                         <a class="nav-link fw-bold" style="color: #134F5C" href="/management">Manajemen</a>
                     </li>
+                    @endif
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     @auth
@@ -50,7 +55,7 @@
                             {{auth()->user()->nama}}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="/home"><i class="bi bi-house-door"></i>Home</a></li>
+                            <li><a class="dropdown-item" href="/home"><i class="bi bi-house-door"></i>Profil</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -73,10 +78,8 @@
             </div>
         </div>
     </nav>
-
-    <div>
         @yield('body')
-    </div>
+   
 </body>
 
 </html>

@@ -4,11 +4,23 @@
 <head>
 
     <link rel="stylesheet" href="/css/popupform.css">
+    <style>
+        h1 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+        h2 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+    </style>
 </head>
 <div style="margin-left:15%">
 
     <div class="w3-container w3-light-blue">
-        <h1>Manage Fakultas</h1>
+        <h1>Manajemen Fakultas</h1>
     </div>
 
     <div class="w3-container">
@@ -60,7 +72,7 @@
                         <div class="d-flex">
 
                             <button type="submit" name="edit" class="btn btn-info text-light" style="margin-right: 1ch; background-color: blue;" onclick="openRegisterFormEdit('{{ $f->id }}','{{ $f->nama }}','{{ $f->id_jenjang }}')">Edit</button>
-                            <form action="{{ route('fakultasM')}}" method="post">
+                            <form action="{{ route('fakultasM')}}" method="post"  onsubmit="return confirmDelete()">
                                 @csrf
                                 <input type="hidden" name="fakultas_id" value="{{ $f->id }}">
                                 <button type="submit" name="edit" value="2" class="btn btn-info text-light" style="background-color: red;">Hapus</button>
@@ -86,7 +98,7 @@
             @csrf
             <h1>Tambah Mata kuliah</h1>
             <label class="form-label mt-3">Nama Fakultas:</label>
-            <input class="form-control" name="nama_fakultas" id="nama_fakultas" type="text" placeholder="MIPA" required>
+            <input class="form-control" name="nama_fakultas" id="nama_fakultas" type="text" placeholder="ex: MIPA" required>
 
             <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2" required>
                 <option value="">-- Pilih Janjang --</option>
@@ -135,13 +147,7 @@
         document.getElementById("registerForm").style.display = "none";
     }
 
-    // ปิดฟอร์มเมื่อคลิกนอกพื้นที่ของป๊อปอัพ
-    window.onclick = function(event) {
-        var registerForm = document.getElementById("registerForm");
-        if (event.target == registerForm) {
-            registerForm.style.display = "none";
-        }
-    }
+   
 
     function openRegisterFormEdit(id, nama, id_jenjang) {
         var form = document.getElementById("registerFormEdit");
@@ -157,12 +163,8 @@
     function closeRegisterFormEdit() {
         document.getElementById("registerFormEdit").style.display = "none";
     }
-    // ปิดฟอร์มเมื่อคลิกนอกพื้นที่ของป๊อปอัพ
-    window.onclick = function(event) {
-        var registerFormEdit = document.getElementById("registerFormEdit");
-        if (event.target == registerFormEdit) {
-            registerFormEdit.style.display = "none";
-        }
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this item?');
     }
 </script>
 

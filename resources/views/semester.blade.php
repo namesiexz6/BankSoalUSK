@@ -1,90 +1,102 @@
 @extends('navbar')
 @section('body')
-<div class="container mt-3">
-    <div class="container">
+<div class="background" style="background-image: url('{{ Storage::url('pretty-women-studying-bed.jpg') }}'); background-size: cover; background-position: center; height: 32vh;">
+    <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">Pilih Kriteria untuk Mencari Soal</h2>
+    <div class="container mt-3">
+        
         <div class="row">
             <div class="col-md-3">
-            <form action="{{ route('cariSemester') }}" method="post" id="semesterForm">
-            @csrf
-                <label for="jenjang" class="form-label mt-3">Pilih Jenjang:</label>
-                <select class="form-control" aria-label="Default select" name="jenjang" id="jenjang">
-    
-                    <option value="">-- Pilih Jenjang --</option>
-                    @foreach ($jenjang as $jj)
-                    <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>{{ $jj->nama }}</option>
-                    @endforeach
-                </select>
-            </div>   
-            <div class="col-md-3">
-                <label for="fakultas" class="form-label mt-3">Pilih Fakultas:</label>
-                <select class="form-control" aria-label="Default select" name="fakultas" id="fakultas" {{ !session('jenjang') ? 'disabled' : '' }}>
-                    <option value="">-- Pilih Fakultas --</option>
-                    @foreach ($fakultas as $f)
-                    <option value="{{ $f->id }}" {{ session('fakultas') == $f->id ? 'selected' : '' }}>{{ $f->nama }}</option>
-                    @endforeach
-                </select>
-             </div>    
-             <div class="col-md-3">
-                <label for="prodi" class="form-label mt-3">Pilih Prodi:</label>
-                <select class="form-control" aria-label="Default select" name="prodi" id="prodi" {{ !session('fakultas') ? 'disabled' : '' }}>
-                    <option value="">-- Pilih Prodi --</option>
-                    @foreach ($prodi as $p)
-                    <option value="{{ $p->id }}" {{ session('prodi') == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
-                    @endforeach
-                </select>
-             </div>   
-             <div class="col-md-3">
-                    <label for="semester" class="form-label mt-3">Pilih Semester:</label>
-                    <select class="form-control" aria-label="Default select" name="semester" id="semester" {{ !session('prodi') ? 'disabled' : '' }}>
-                        <option disabled selected value="">-- Pilih Semester --</option>
-                        @foreach ($semester as $s)
-                        <option value="{{ $s->id }}" {{ session('semester') == $s->id ? 'selected' : '' }}>{{ $s->nama }}</option>
+                <form action="{{ route('cariSemester') }}" method="post" id="semesterForm">
+                    @csrf
+                    <label for="jenjang" class="form-label mt-3" style="color: white;">Jenjang:</label>
+                    <select class="form-control" aria-label="Default select" name="jenjang" id="jenjang">
+                        <option value="">-Semua-</option>
+                        @foreach ($jenjang as $jj)
+                            <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>
+                                {{ $jj->nama }}
+                            </option>
                         @endforeach
                     </select>
+            </div>
+            <div class="col-md-3">
+                <label for="fakultas" class="form-label mt-3" style="color: white;">Fakultas:</label>
+                <select class="form-control" aria-label="Default select" name="fakultas" id="fakultas" {{ !session('jenjang') ? 'disabled' : '' }}>
+                    <option value="">-Semua-</option>
+                    @foreach ($fakultas as $f)
+                        <option value="{{ $f->id }}" {{ session('fakultas') == $f->id ? 'selected' : '' }}>{{ $f->nama }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="prodi" class="form-label mt-3" style="color: white;">Prodi:</label>
+                <select class="form-control" aria-label="Default select" name="prodi" id="prodi" {{ !session('fakultas') ? 'disabled' : '' }}>
+                    <option value="">-Semua-</option>
+                    @foreach ($prodi as $p)
+                        <option value="{{ $p->id }}" {{ session('prodi') == $p->id ? 'selected' : '' }}>{{ $p->nama }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="semester" class="form-label mt-3" style="color: white;">Semester:</label>
+                <select class="form-control" aria-label="Default select" name="semester" id="semester" {{ !session('prodi') ? 'disabled' : '' }}>
+                    <option value="">-Semua-</option>
+                    @foreach ($semester as $s)
+                        <option value="{{ $s->id }}" {{ session('semester') == $s->id ? 'selected' : '' }}>{{ $s->nama }}
+                        </option>
+                    @endforeach
+                </select>
                 </form>
             </div>
         </div>
-    </div>
 
-    @if(session('semester') != 0)
-    <h2 class="mt-5">Daftar Mata Kuliah</h2>
-    <table class="table table-bordered table-light table-striped my-3">
-        <thead class="table-dark">
-            <tr>
-                <th colspan="5">{{ session('semester_nama') }}</th>
-            </tr>
-            <tr>
-                <th scope="col">No</th>
-                <th scope="col">Kode</th>
-                <th scope="col">Mata Kuliah</th>
-                <th scope="col">SKS</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($matakuliah as $matakuliahs)
-            <tr>
-                <th scope="row">{{ $loop->iteration }}</th>
-                <td>{{ $matakuliahs->kode }}</td>
-                <td>{{ $matakuliahs->nama }}</td>
-                <td>{{ $matakuliahs->sks }}</td>
-                <td>
-                    <form action="{{ route('pilihsoal') }}" method="post">
-                        @csrf
-                        <input type="hidden" name="matakuliah_id" value="{{ $matakuliahs->id }}">
-                        <button type="submit" class="btn btn-info text-light">Lihat</button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-    @endif
+        </div>
+        </div>
+        <div class="container ">
+        @if(session('semester') != 0)
+            <h2 class="mt-3" >Daftar Mata Kuliah</h2>
+
+            <table class="table table-bordered table-light table-striped my-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th colspan="5">{{ session('semester_nama') }}</th>
+                    </tr>
+
+                    <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">Kode</th>
+                        <th scope="col">Mata Kuliah</th>
+                        <th scope="col">SKS</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach ($matakuliah as $matakuliahs)
+                        <tr>
+                            <th scope="row">{{ $loop->iteration }}</th>
+                            <td>{{ $matakuliahs->kode }}</td>
+                            <td>{{ $matakuliahs->nama }}</td>
+                            <td>{{ $matakuliahs->sks }}</td>
+                            <td>
+                                <form action="{{ route('pilihsoal') }}" method="post">
+                                    @csrf
+                                    <input type="hidden" name="matakuliah_id" value="{{ $matakuliahs->id }}">
+                                    <button type="submit" class="btn btn-info text-light">Lihat</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+    
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         let jenjang = $('#jenjang');
         let fakultas = $('#fakultas');
         let prodi = $('#prodi');
@@ -92,7 +104,7 @@
         let semesterForm = $('#semesterForm');
         let csrfToken = '{{ csrf_token() }}';
 
-        jenjang.change(function() {
+        jenjang.change(function () {
             let idJenjang = this.value;
             if (idJenjang) {
                 fakultas.prop('disabled', false);
@@ -104,15 +116,15 @@
                         _token: csrfToken
                     },
                     dataType: 'json',
-                    success: function(result) {
-                        fakultas.empty().append('<option value="">-- Pilih Fakultas --</option>');
-                        $.each(result.fakultas, function(key, value) {
+                    success: function (result) {
+                        fakultas.empty().append('<option value="">-Semua-</option>');
+                        $.each(result.fakultas, function (key, value) {
                             fakultas.append('<option value="' + value.id + '">' + value.nama + '</option>');
                         });
                         prodi.prop('disabled', true);
                         semester.prop('disabled', true);
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('AJAX Error:', error);
                     }
                 });
@@ -123,7 +135,7 @@
             }
         });
 
-        fakultas.change(function() {
+        fakultas.change(function () {
             let idFakultas = this.value;
             if (idFakultas) {
                 prodi.prop('disabled', false);
@@ -135,14 +147,14 @@
                         _token: csrfToken
                     },
                     dataType: 'json',
-                    success: function(result) {
-                        prodi.empty().append('<option value="">-- Pilih Prodi --</option>');
-                        $.each(result.prodi, function(key, value) {
+                    success: function (result) {
+                        prodi.empty().append('<option value="">-Semua-</option>');
+                        $.each(result.prodi, function (key, value) {
                             prodi.append('<option value="' + value.id + '">' + value.nama + '</option>');
                         });
                         semester.prop('disabled', true);
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('AJAX Error:', error);
                     }
                 });
@@ -152,7 +164,7 @@
             }
         });
 
-        prodi.change(function() {
+        prodi.change(function () {
             let idProdi = this.value;
             if (idProdi) {
                 semester.prop('disabled', false);
@@ -164,13 +176,13 @@
                         _token: csrfToken
                     },
                     dataType: 'json',
-                    success: function(result) {
-                        semester.empty().append('<option value="">-- Pilih Semester --</option>');
-                        $.each(result.semester, function(key, value) {
+                    success: function (result) {
+                        semester.empty().append('<option value="">-Semua-</option>');
+                        $.each(result.semester, function (key, value) {
                             semester.append('<option value="' + value.id + '">' + value.nama + '</option>');
                         });
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('AJAX Error:', error);
                     }
                 });
@@ -179,7 +191,7 @@
             }
         });
 
-        semester.change(function() {
+        semester.change(function () {
             semesterForm.submit();
         });
     });

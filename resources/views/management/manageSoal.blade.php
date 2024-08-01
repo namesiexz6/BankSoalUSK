@@ -3,13 +3,25 @@
 
 <head>
 
-    <link rel="stylesheet" href="/css/popupform.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.1.1/tinymce.min.js" integrity="sha512-bAtLCmEwg+N9nr6iVELr/SlDxBlyoF0iVdPxAvcOCfUiyi6RcuS6Lzawi78iPbAfbNyIUftvwK9HPWd+3p975Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="/css/popupform.css">
+    <style>
+        h1 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+        h2 {
+            font-size: 25px;
+            font-weight: 500;
+            font-family: Montserrat, sans-serif;
+        }
+    </style>
 </head>
 
 <div style="margin-left:15%">
     <div class="w3-container w3-light-blue">
-        <h1>Manage Soal</h1>
+        <h1>Manajemen Soal</h1>
     </div>
 
     <div class="w3-container">
@@ -101,9 +113,8 @@
                     <td>{{ $soals->updated_at }}</td>
                     <td>
                         <div class="d-flex">
-
                             <button type="submit" name="edit" class="btn btn-info text-light" style="margin-right: 1ch; background-color: blue;" onclick="openRegisterFormEdit('{{ $soals->id }}','{{ $soals->nama_soal }}','{{ $soals->id_matakuliah }}')">Edit</button>
-                            <form action="{{ route('soalM')}}" method="post">
+                            <form action="{{ route('soalM')}}" method="post" onsubmit="return confirmDelete()">
                                 @csrf
                                 <input type="hidden" name="soal_id" value="{{ $soals->id }}">
                                 <button type="submit" name="edit" value="2" class="btn btn-info text-light" style="background-color: red;">Hapus</button>
@@ -399,13 +410,7 @@
         document.getElementById("registerForm").style.display = "none";
     }
 
-    // ปิดฟอร์มเมื่อคลิกนอกพื้นที่ของป๊อปอัพ
-    window.onclick = function(event) {
-        var registerForm = document.getElementById("registerForm");
-        if (event.target == registerForm) {
-            registerForm.style.display = "none";
-        }
-    }
+
 
     function openRegisterFormEdit(id, nama, id_matakuliah) {
         var form = document.getElementById("registerFormEdit");
@@ -421,12 +426,9 @@
     function closeRegisterFormEdit() {
         document.getElementById("registerFormEdit").style.display = "none";
     }
-    // ปิดฟอร์มเมื่อคลิกนอกพื้นที่ของป๊อปอัพ
-    window.onclick = function(event) {
-        var registerFormEdit = document.getElementById("registerFormEdit");
-        if (event.target == registerFormEdit) {
-            registerFormEdit.style.display = "none";
-        }
+
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this item?');
     }
 </script>
 <script>
