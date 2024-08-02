@@ -1,10 +1,6 @@
+
 @foreach ($komentar_parents as $komentar)
     @if ($komentar->id_post == $post_id)
-        <select class="sort-comments mt-3 mb-2" id="sort-comments-{{ $post_id}}" onchange="sortComments({{ $post_id}})">
-            <option value="newest">Terbaru</option>
-            <option value="oldest">Terlama</option>
-            <option value="most_rated">Terbanyak Rating</option>
-        </select>
 
         <div class="comment">
             <div class="comment-header">
