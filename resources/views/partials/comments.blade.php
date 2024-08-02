@@ -1,4 +1,4 @@
-<div id="comments-container">
+<div id="comments-container2">
     @foreach ($komentar_parents as $komentar)
     <div class="post" id="post-{{ $komentar->id }}">
         <div class="post-header">

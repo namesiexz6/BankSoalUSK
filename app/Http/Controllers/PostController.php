@@ -14,57 +14,136 @@ use Illuminate\Support\Facades\Storage;
 class PostController extends Controller
 {
     public function index(Request $request)
-{
-    $id_mk = $request->input("id_mk");
-
-    session()->put("id_mk", $id_mk);
-    $posts = Post::where("id_mk", $id_mk)->orderBy("id", "asc")->get();
-    $post_ids = $posts->pluck('id'); 
-
-    // รับพารามิเตอร์การเรียงลำดับจาก request
-    $sort = $request->input('sort', 'newest'); // ค่าเริ่มต้นคือ 'newest'
-
-    // จัดการการเรียงลำดับตามพารามิเตอร์
-    if ($sort == 'newest') {
-        $komentar_post = KomentarPost::whereIn("id_post", $post_ids)->orderBy("created_at", "desc")->get();
-    } elseif ($sort == 'oldest') {
-        $komentar_post = KomentarPost::whereIn("id_post", $post_ids)->orderBy("created_at", "asc")->get();
-    } elseif ($sort == 'most_rated') {
-        $komentar_post = KomentarPost::whereIn("id_post", $post_ids)
-            ->leftJoin('rating_komentar_post', 'komentar_post.id', '=', 'rating_komentar_post.id_komentar')
-            ->selectRaw('komentar_post.*, COUNT(rating_komentar_post.id) as rating_count')
-            ->groupBy('komentar_post.id', 'komentar_post.id_post', 'komentar_post.id_user', 'komentar_post.parent_id', 'komentar_post.isi_komentar', 'komentar_post.file_komentar', 'komentar_post.created_at', 'komentar_post.updated_at')
-            ->orderBy('rating_count', 'desc')
+    {
+        $id_mk = $request->input("id_mk");
+        if ($id_mk == null) {
+            $id_mk = session()->get("id_matakuliah");
+        }
+        session()->put("id_matakuliah", $id_mk);
+        $posts = Post::where("id_mk", $id_mk)
+            ->with('loves') // Eager load the loves relationship
+            ->orderBy("id", "asc")
             ->get();
+
+        $post_ids = $posts->pluck('id');
+        if ($post_ids == null) {
+            $post_ids = session()->get("id_post");
+        }
+        session()->put("id_post", $post_ids);
+
+        $commentSort = $request->input('sort', 'newest');
+
+        $sort = $request->input('sort', 'newest');
+
+        if($sort == 'newest'){
+            $posts = Post::where("id_mk", $id_mk)->orderBy("created_at", "desc")->get();
+        }elseif($sort == 'oldest'){
+            $posts = Post::where("id_mk", $id_mk)->orderBy("created_at", "asc")->get();
+        }elseif($sort == 'most_rated'){
+            $posts = Post::where("id_mk", $id_mk)
+                ->leftJoin('love_post', 'post.id', '=', 'love_post.id_post')
+                ->selectRaw('post.*, COUNT(love_post.id) as love_count')
+                ->groupBy('post.id', 'post.id_mk', 'post.id_user', 'post.isi_post', 'post.file_post', 'post.created_at', 'post.updated_at')
+                ->orderBy('love_count', 'desc')
+                ->get();
+        }
+        $komentar_post = $this->sortCommentsQuery($post_ids, $commentSort);
+
+        $user_id = $posts->pluck('id_user')->unique();
+        $userPost = User::whereIn("id", $user_id)->orderBy("id", "asc")->get()->keyBy('id');
+
+        $user_ids = $komentar_post->pluck('id_user')->unique();
+        $user = User::whereIn("id", $user_ids)->orderBy("id", "asc")->get()->keyBy('id');
+
+        $usernow = Auth::user();
+
+        $ratings = rating_komentar_post::where('id_user', $usernow->id)
+            ->whereIn('id_komentar', $komentar_post->pluck('id'))
+            ->get()
+            ->keyBy('id_komentar');
+
+        $ratingData = rating_komentar_post::selectRaw('id_komentar, AVG(rating) as avg_rating, COUNT(id) as rating_count')
+            ->whereIn('id_komentar', $komentar_post->pluck('id'))
+            ->groupBy('id_komentar')
+            ->get()
+            ->keyBy('id_komentar');
+
+        $komentar_parents = $komentar_post->whereNull('parent_id');
+        $komentar_replies = $komentar_post->whereNotNull('parent_id')->groupBy('parent_id');
+        if ($request->ajax()) {
+            return view('partials.posts', compact('posts', 'komentar_parents', 'komentar_replies', 'user', 'userPost', 'usernow', 'ratings', 'ratingData', 'commentSort','sort'))->render();
+        }
+
+        return view("threadpage", compact('posts', 'komentar_parents', 'komentar_replies', 'user', 'userPost', 'usernow', 'ratings', 'ratingData', 'commentSort','sort'));
     }
-    $user_id = $posts->pluck('id_user')->unique();
-    $userPost = User::whereIn("id", $user_id)->orderBy("id", "asc")->get()->keyBy('id');
 
-    $user_ids = $komentar_post->pluck('id_user')->unique();
-    $user = User::whereIn("id", $user_ids)->orderBy("id", "asc")->get()->keyBy('id');
-
-    $usernow = Auth::user();
-
-    $ratings = rating_komentar_post::where('id_user', $usernow->id)
-        ->whereIn('id_komentar', $komentar_post->pluck('id'))
-        ->get()
-        ->keyBy('id_komentar');
-
-    $ratingData = rating_komentar_post::selectRaw('id_komentar, AVG(rating) as avg_rating, COUNT(id) as rating_count')
-        ->whereIn('id_komentar', $komentar_post->pluck('id'))
-        ->groupBy('id_komentar')
-        ->get()
-        ->keyBy('id_komentar');
-
-    $komentar_parents = $komentar_post->whereNull('parent_id');
-    $komentar_replies = $komentar_post->whereNotNull('parent_id')->groupBy('parent_id');
-
-    if ($request->ajax()) {
-        return view('partials.comments', compact('komentar_parents', 'komentar_replies', 'user', 'ratings', 'ratingData', 'sort'))->render();
+    private function sortCommentsQuery($post_ids, $commentSort)
+    {
+        if ($commentSort == 'newest') {
+            return KomentarPost::whereIn("id_post", $post_ids)->orderBy("created_at", "desc")->get();
+        } elseif ($commentSort == 'oldest') {
+            return KomentarPost::whereIn("id_post", $post_ids)->orderBy("created_at", "asc")->get();
+        } elseif ($commentSort == 'most_rated') {
+            return KomentarPost::whereIn("id_post", $post_ids)
+                ->leftJoin('rating_komentar_post', 'komentar_post.id', '=', 'rating_komentar_post.id_komentar')
+                ->selectRaw('komentar_post.*, COUNT(rating_komentar_post.id) as rating_count')
+                ->groupBy('komentar_post.id', 'komentar_post.id_post', 'komentar_post.id_user', 'komentar_post.parent_id', 'komentar_post.isi_komentar', 'komentar_post.file_komentar', 'komentar_post.created_at', 'komentar_post.updated_at')
+                ->orderBy('rating_count', 'desc')
+                ->get();
+        }
     }
 
-    return view("threadpage", compact('posts', 'komentar_parents', 'komentar_replies', 'user','userPost', 'usernow', 'ratings', 'ratingData', 'sort'));
-}
+    public function sortComments(Request $request)
+    {
+        $post_id = $request->input('post_id');
+        $sort = $request->input('sort', 'newest');
+        $comments = $this->sortCommentsQuery([$post_id], $sort);
+        $usernow = Auth::user();
+        $user_ids = $comments->pluck('id_user')->unique();
+        $user = User::whereIn('id', $user_ids)->get()->keyBy('id');
+        $ratings = rating_komentar_post::where('id_user', $usernow->id)
+            ->whereIn('id_komentar', $comments->pluck('id'))
+            ->get()
+            ->keyBy('id_komentar');
+
+        $ratingData = rating_komentar_post::selectRaw('id_komentar, AVG(rating) as avg_rating, COUNT(id) as rating_count')
+            ->whereIn('id_komentar', $comments->pluck('id'))
+            ->groupBy('id_komentar')
+            ->get()
+            ->keyBy('id_komentar');
+
+        $komentar_parents = $comments->whereNull('parent_id');
+        $komentar_replies = $comments->whereNotNull('parent_id')->groupBy('parent_id');
+
+        $commentsHtml = view('partials.commentPost', compact('komentar_parents', 'komentar_replies', 'user', 'ratings', 'ratingData', 'post_id'))->render();
+
+        return response()->json(['success' => true, 'commentsHtml' => $commentsHtml]);
+    }
+
+    public function loadComments($post_id)
+    {
+        $comments = KomentarPost::where('id_post', $post_id)->orderBy('created_at', 'desc')->get();
+
+        $user_ids = $comments->pluck('id_user')->unique();
+        $user = User::whereIn('id', $user_ids)->get()->keyBy('id');
+        $usernow = Auth::user();
+        $ratings = rating_komentar_post::where('id_user', $usernow->id)
+            ->whereIn('id_komentar', $comments->pluck('id'))
+            ->get()
+            ->keyBy('id_komentar');
+        $ratingData = rating_komentar_post::selectRaw('id_komentar, AVG(rating) as avg_rating, COUNT(id) as rating_count')
+            ->whereIn('id_komentar', $comments->pluck('id'))
+            ->groupBy('id_komentar')
+            ->get()
+            ->keyBy('id_komentar');
+
+        $komentar_parents = $comments->whereNull('parent_id');
+        $komentar_replies = $comments->whereNotNull('parent_id')->groupBy('parent_id');
+
+        $commentsHtml = view('partials.commentPost', compact('komentar_parents', 'komentar_replies', 'user', 'ratings', 'ratingData', 'post_id'))->render();
+
+        return response()->json(['success' => true, 'commentsHtml' => $commentsHtml]);
+    }
 
 
     public function addPost(Request $request)
@@ -74,7 +153,7 @@ class PostController extends Controller
             'isi_post' => 'required|string|max:255',
             'file_post.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-    
+
         $post = new Post();
         $post->id_mk = $request->id_mk;
         $post->id_user = Auth::id();
@@ -92,9 +171,9 @@ class PostController extends Controller
             }
             $post->file_post = json_encode($images);
         }
-    
+
         $post->save();
-    
+
         return response()->json(['success' => true]);
     }
 
@@ -105,14 +184,54 @@ class PostController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
+        // Delete all associated loves
+        LovePost::where('id_post', $id)->delete();
+
+        // Delete all associated comments and their related ratings and files
+        $comments = KomentarPost::where('id_post', $id)->get();
+        foreach ($comments as $comment) {
+            // Delete ratings associated with the comment
+            rating_komentar_post::where('id_komentar', $comment->id)->delete();
+
+            // Delete comment files
+            $this->deleteCommentFiles($comment);
+
+            // Delete child comments
+            $childComments = KomentarPost::where('parent_id', $comment->id)->get();
+            foreach ($childComments as $childComment) {
+                rating_komentar_post::where('id_komentar', $childComment->id)->delete();
+                $this->deleteCommentFiles($childComment);
+                $childComment->delete();
+            }
+
+            // Delete the comment
+            $comment->delete();
+        }
+
+        // Delete post files
+        $this->deletePostFiles($post);
+
+        // Delete the post
         $post->delete();
 
         return response()->json(['success' => true]);
     }
+    private function deletePostFiles($post)
+    {
+        if ($post->file_post) {
+            $images = json_decode($post->file_post);
+            foreach ($images as $image) {
+                $path = 'public/post/' . $post->id_mk . '/' . $image;
+                if (Storage::exists($path)) {
+                    Storage::delete($path);
+                }
+            }
+        }
+    }
     public function addKomentar(Request $request)
     {
         $request->validate([
-            'id_post' => 'required|exists:posts,id',
+            'id_post' => 'required|exists:post,id',
             'isi_komentar' => 'required|string|max:255',
             'file_komentar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'parent_id' => 'nullable|exists:komentar_post,id',
@@ -147,31 +266,66 @@ class PostController extends Controller
 
     public function destroyKomentar($id)
     {
-        $komentar = KomentarPost::findOrFail($id);
-        if ($komentar->id_user != Auth::id() && Auth::user()->level != 1) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        $komentar = KomentarPost::find($id);
+        $id_post = $komentar->id_post;
+
+        if ($komentar) {
+            // ลบเรตติ้งของคอมเม้น
+            rating_komentar_post::where('id_komentar', $id)->delete();
+
+            // ค้นหาคอมเม้นลูกทั้งหมด
+            $childComments = KomentarPost::where('parent_id', $id)->get();
+
+            // ลบคอมเม้นลูกทั้งหมด
+            foreach ($childComments as $childComment) {
+                rating_komentar_post::where('id_komentar', $childComment->id)->delete();
+                $this->deleteCommentFiles($childComment);
+                $childComment->delete();
+            }
+
+            // ลบไฟล์ภาพของคอมเม้นหลัก
+            $this->deleteCommentFiles($komentar);
+
+            // ลบคอมเม้นหลัก
+            $komentar->delete();
+
+            return response()->json(['success' => true, 'id_post' => $id_post]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Comment not found']);
         }
-
-        $komentar->delete();
-
-        return response()->json(['success' => true]);
+    }
+    private function deleteCommentFiles($komentar)
+    {
+        if ($komentar->file_komentar) {
+            $images = json_decode($komentar->file_komentar);
+            foreach ($images as $image) {
+                $path = 'public/komentarPost/' . $komentar->id_post . '/' . $image;
+                if (Storage::exists($path)) {
+                    Storage::delete($path);
+                }
+            }
+        }
     }
 
-    public function addlove($id)
+    public function addLove($id)
     {
         $post = Post::findOrFail($id);
         $love = LovePost::where('id_post', $id)->where('id_user', Auth::id())->first();
 
         if ($love) {
             $love->delete();
+            $action = 'unloved';
         } else {
             LovePost::create([
                 'id_post' => $id,
                 'id_user' => Auth::id(),
             ]);
+            $action = 'loved';
         }
 
-        return response()->json(['success' => true]);
+        $loveCount = $post->loves->count();
+
+        return response()->json(['success' => true, 'action' => $action, 'post_id' => $id, 'love_count' => $loveCount]);
     }
 
     public function destroyLove($id)
@@ -182,6 +336,37 @@ class PostController extends Controller
             $love->delete();
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'post_id' => $id]);
+    }
+
+    public function submitRating(Request $request)
+    {
+        $request->validate([
+            'id_komentar' => 'required|exists:komentar_post,id',
+            'rating' => 'required|integer|min:1|max:5'
+        ]);
+
+        $rating = rating_komentar_post::updateOrCreate(
+            [
+                'id_komentar' => $request->id_komentar,
+                'id_user' => Auth::id()
+            ],
+            [
+                'rating' => $request->rating
+            ]
+        );
+
+        $komentar = KomentarPost::find($request->id_komentar);
+        $avgRating = rating_komentar_post::where('id_komentar', $request->id_komentar)
+            ->avg('rating');
+        $ratingCount = rating_komentar_post::where('id_komentar', $request->id_komentar)
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'avg_rating' => number_format($avgRating, 1),
+            'rating_count' => $ratingCount,
+            'komentar_id' => $request->id_komentar
+        ]);
     }
 }

@@ -36,14 +36,22 @@ textarea {
     transition: 0.5s;
 }
 
-.sidebar,
-.content,
-.button-container,
+
+.content {
+    
+    margin-top: 20px;
+    padding: 20px;
+    background: #f7f7f7;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 70%;
+}
 .post {
     background: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+   
 }
 
 .button-container {
@@ -167,16 +175,38 @@ textarea {
     justify-content: flex-start;
     margin-bottom: 10px;
 }
+.post-images {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
 
 .comment-images a,
+.post-images a,
 .more-images {
     text-align: center;
     overflow: hidden;
+    
 }
 
 .comment-images img {
     width: 125px;
     height: 125px;
+    object-fit: cover;
+    display: flex;
+    border-radius: 4px;
+    justify-content: center;
+}
+.post-images img {
+    
+    min-width: 233px;
+    max-width: 700px;
+    min-height: 233px;
+    max-height: 400px;
     object-fit: cover;
     display: flex;
     border-radius: 4px;
@@ -197,9 +227,22 @@ textarea {
     height: 125px;
     border-radius: 4px;
 }
+.more-image-post {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 24px;
+    text-align: center;
+    width: 233px;
+    height: 400px;
+    border-radius: 4px;
+}
 
 .post-header,
-.comment-header {
+.comment-header,
+.reply-comment-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -253,13 +296,24 @@ textarea {
     display: none;
     margin-top: 10px;
 }
-
-.comment {
+.comment-form {
+    display: none;
+    margin-top: 10px;
+}
+.comment{
     margin-top: 10px;
     padding: 20px;
     background: #e6e6e6;
     border-radius: 8px;
     margin-left: 20px;
+
+}
+.reply-comment {
+    margin-top: 10px;
+    padding: 20px;
+    background: #e6e6e6;
+    border-radius: 8px;
+    margin-left: 50px;
 }
 
 .card {

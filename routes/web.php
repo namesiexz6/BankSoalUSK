@@ -75,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post("/addMatakuliah", [ManagementController::class, 'addMatakuliah'])->name("tambahMatakuliahM");
 
     Route::post('/submit-rating', [SoalsController::class, 'submitRating'])->name('submit.rating');
+    Route::post('/submit-rating-post', [PostController::class, 'submitRating'])->name('submit.rating.post');
 
 
     //edit and delete data 
@@ -90,11 +91,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/thread', [PostController::class, 'index'])->name('post.index');
     Route::post('/thread', [PostController::class, 'index'])->name('post.index');
     Route::post('/post', [PostController::class, 'addPost'])->name('post.store');
+    Route::get('/posts', [PostController::class, 'loadPosts'])->name('posts.load');
     Route::delete('/post/{id}', [PostController::class, 'destroyPost'])->name('post.destroy');
     Route::post('/komentar-post', [PostController::class, 'addKomentar'])->name('komentarPost.store');
     Route::delete('/komentar-post/{id}', [PostController::class, 'destroyKomentar'])->name('komentarPost.destroy');
-    Route::post('/love-post/{id}', [PostController::class, 'addLove'])->name('lovePost.store');
-    Route::delete('/love-post/{id}', [PostController::class, 'destroyLove'])->name('lovePost.destroy');
+
+    Route::post('/love/{id}', [PostController::class, 'addLove']);
+    Route::post('/unlove/{id}', [PostController::class, 'destroyLove']);
+
+
+    Route::post('/komentar-post/sort', [PostController::class, 'sortComments'])->name('komentar-post.sort');
+
+    // Route สำหรับการโหลดคอมเม้นต์ของโพสต์
+    Route::get('/komentar-post/{post_id}', [PostController::class, 'loadComments'])->name('komentar-post.load');
 
 });
 

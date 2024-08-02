@@ -19,213 +19,235 @@
             width: 120px;
             /* ขนาดโลโก้ */
         }
+
         .delete-button.disabled {
-        cursor: not-allowed;
-        color: grey;
-    }
+            cursor: not-allowed;
+            color: grey;
+        }
     </style>
 </head>
 <div>
-<div class="leftcolumn">
-    <div class="card">
-        @foreach ($soal as $soals)
-        <h2>{{ $soals->nama_soal }}</h2>
-        @if ($soals->tipe == 1)
-        <iframe src="{{ Storage::url('pdf/' . $soals->isi_soal) }}" height="600"></iframe>
-        @elseif ($soals->tipe == 2)
-        <iframe src="{{ Storage::url('html/' . $soals->isi_soal) }}" height="600"></iframe>
-        @endif
-        @endforeach
-    </div>
-</div>
-
-<div class="rightcolumn" id="rightcolumn">
-    @if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-    @endif
-    <form class="mt-4" action="/komentar" method="post" enctype="multipart/form-data" id="comment-form">
-        @csrf
-        <input type="hidden" name="id_soal" value="{{ $soals->id }}">
-        <div class="comment-box">
-            <h2>Komentar</h2>
-            <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
-            <div class="comment-actions">
-                <label for="file-upload" class="file-upload">
-                    <input type="file" id="file-upload" name="file_komentar[]" accept="image/*" multiple style="display: none;" onchange="previewImages(event)">
-                    <i class="fa fa-image"></i>
-                </label>
-                <button type="button" class="btn btn-info text-light" onclick="submitForm()">
-                    <i class="fa fa-paper-plane"></i>
-                </button>
-            </div>
-            <div class="image-preview" id="image-preview"></div>
-        </div>
-    </form>
-    <select class="sort-comments mt-3 mb-2" id="sort-comments" onchange="sortComments()">
-        <option value="newest" {{ $sort == 'newest' ? 'selected' : '' }}>Terbaru</option>
-        <option value="oldest" {{ $sort == 'oldest' ? 'selected' : '' }}>Terlama</option>
-        <option value="most_rated" {{ $sort == 'most_rated' ? 'selected' : '' }}>Terbanyak Rating</option>
-    </select>
-    <div id="comments-container">
-        @foreach ($komentar_parents as $komentar)
-        <div class="post" id="post-{{ $komentar->id }}">
-            <div class="post-header">
-                <div class="user">
-                    <span style="font-weight:bold;">{{ $user->get($komentar->id_user)->nama }}</span>
-                </div>
-                <div class="avg_rating" data-komentar-id="{{ $komentar->id }}">
-                    <span>★</span>
-                    <span>{{ isset($ratingData[$komentar->id]) ? number_format($ratingData[$komentar->id]->avg_rating, 1) : '0.0' }}</span>
-                    <span>({{ isset($ratingData[$komentar->id]) ? $ratingData[$komentar->id]->rating_count : '0' }})</span>
-                </div>
-            </div>
-            <div class="user-level">
-                @if($user->get($komentar->id_user)->level == 1)
-                <span>Admin</span>
-                @elseif($user->get($komentar->id_user)->level == 2)
-                <span>Dosen</span>
-                @elseif($user->get($komentar->id_user)->level == 3)
-                <span>Mahasiswa</span>
+    <div class="leftcolumn">
+        <div class="card">
+            @foreach ($soal as $soals)
+                <h2>{{ $soals->nama_soal }}</h2>
+                @if ($soals->tipe == 1)
+                    <iframe src="{{ Storage::url('pdf/' . $soals->isi_soal) }}" height="600"></iframe>
+                @elseif ($soals->tipe == 2)
+                    <iframe src="{{ Storage::url('html/' . $soals->isi_soal) }}" height="600"></iframe>
                 @endif
-                <span>{{ \Carbon\Carbon::parse($komentar->updated_at)->locale('id')->diffForHumans() }}</span>
-            </div>
-            <div class="post-content">{{ $komentar->isi_komentar }}</div>
-            @if ($komentar->file_komentar)
-            <div class="comment-images">
-                @php
-                $images = json_decode($komentar->file_komentar);
-                $imageCount = count($images);
-                @endphp
-                @foreach ($images as $index => $image)
-                @if ($index < 2) <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})">
-                    <img src="{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}" alt="Comment Image">
-                    </a>
-                    @endif
-                    @endforeach
-                    @if ($imageCount > 2)
-                    <div class="more-images" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $images[2]) }}', 2, {{ json_encode($images) }})">+{{ $imageCount - 2 }}</div>
-                    @endif
-                    @foreach ($images as $index => $image)
-                    @if ($index >= 2)
-                    <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})" style="display:none;">
-                        <img src="{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}" alt="Comment Image">
-                    </a>
-                    @endif
-                    @endforeach
-            </div>
-            @endif
-            <div class="post-footer">
-                <div class="rating" data-komentar-id="{{ $komentar->id }}">
-                    @for ($i = 1; $i <= 5; $i++) <span data-rating="{{ $i }}" class="{{ isset($ratings[$komentar->id]) && $ratings[$komentar->id]->rating >= $i ? 'selected' : '' }}">★</span>
-                        @endfor
-                </div>
-                <div class="comment-button" onclick="showReplyForm({{ $komentar->id }})">Balas</div>
-                @if(auth()->check() && auth()->user()->level == 1 || auth()->user()->id == $komentar->id_user)
-                <div class="delete-button" onclick="deleteComment({{ $komentar->id }})">Delete</div>
-                @else
-                <div class="delete-button disabled">Delete</div>
-                @endif
-            </div>
-            <div class="reply-form" id="reply-form-{{ $komentar->id }}">
-                <form action="/komentar" method="post" enctype="multipart/form-data" class="reply-comment-form" id="reply-comment-form-{{ $komentar->id }}">
-                    @csrf
-                    <input type="hidden" name="id_soal" value="{{ $soals->id }}">
-                    <input type="hidden" name="parent_id" value="{{ $komentar->id }}">
-                    <div class="comment-box">
-                        <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
-                        <div class="comment-actions">
-                            <label for="file-upload-{{ $komentar->id }}" class="file-upload">
-                                <input type="file" id="file-upload-{{ $komentar->id }}" name="file_komentar[]" accept="image/*" multiple style="display: none;" onchange="previewImages2(event)">
-                                <i class="fa fa-image"></i>
-                            </label>
-                            <button type="button" class="btn btn-info text-light" onclick="submitForm2({{ $komentar->id }})">
-                                <i class="fa fa-paper-plane"></i>
-                            </button>
-                        </div>
-                        <div class="image-preview" id="image-preview-{{ $komentar->id }}"></div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        @if (isset($komentar_replies[$komentar->id]))
-        <div class="replies">
-            @foreach ($komentar_replies[$komentar->id] as $reply)
-            <div class="comment" id="post-reply-{{ $reply->id }}">
-                <div class="comment-header">
-                    <div class="user">
-                        <span>{{ $user->get($reply->id_user)->nama }}</span>
-                    </div>
-                    <div class="avg_rating" data-komentar-id="{{ $reply->id }}">
-                        <span>★</span>
-                        <span>{{ isset($ratingData[$reply->id]) ? number_format($ratingData[$reply->id]->avg_rating, 1) : '0.0' }}</span>
-                        <span>({{ isset($ratingData[$reply->id]) ? $ratingData[$reply->id]->rating_count : '0' }})</span>
-                    </div>
-                </div>
-                <div class="user-level">
-                    @if($user->get($reply->id_user)->level == 1)
-                    Admin
-                    @elseif($user->get($reply->id_user)->level == 2)
-                    Dosen
-                    @elseif($user->get($reply->id_user)->level == 3)
-                    Mahasiswa
-                    @endif
-                    <span>{{ \Carbon\Carbon::parse($reply->updated_at)->locale('id')->diffForHumans() }}</span>
-                </div>
-                <div class="comment-content">{{ $reply->isi_komentar }}</div>
-                @if ($reply->file_komentar)
-                <div class="comment-images">
-                    @php
-                    $images = json_decode($reply->file_komentar);
-                    $imageCount = count($images);
-                    @endphp
-                    @foreach ($images as $index => $image)
-                    @if ($index < 2) <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})">
-                        <img src="{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}" alt="Comment Image">
-                        </a>
-                        @endif
-                        @endforeach
-                        @if ($imageCount > 2)
-                        <div class="more-images" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $images[2]) }}', 2, {{ json_encode($images) }})">+{{ $imageCount - 2 }}</div>
-                        @endif
-                        @foreach ($images as $index => $image)
-                        @if ($index >= 2)
-                        <a href="javascript:void(0)" onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})" style="display:none;">
-                            <img src="{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}" alt="Comment Image">
-                        </a>
-                        @endif
-                        @endforeach
-                </div>
-                @endif
-                <div class="comment-footer">
-                    <div class="rating" data-komentar-id="{{ $reply->id }}">
-                        @for ($i = 1; $i <= 5; $i++) <span data-rating="{{ $i }}" class="{{ isset($ratings[$reply->id]) && $ratings[$reply->id]->rating >= $i ? 'selected' : '' }}">★</span>
-                            @endfor
-                    </div>
-                    @if(auth()->check() && auth()->user()->level == 1)
-                    <div class="delete-button" onclick="deleteComment({{ $reply->id }})">Delete</div>
-                    @else
-                    <div class="delete-button disabled">Delete</div>
-                    @endif
-                </div>
-            </div>
             @endforeach
         </div>
-        @endif
-        @endforeach
     </div>
-</div>
 
-<!-- The Modal -->
-<div id="imageModal" class="modal">
-    <span class="close" onclick="closeImageModal()">&times;</span>
-    <span class="prev" onclick="changeImage(-1)">&#10094;</span>
-    <span class="next" onclick="changeImage(1)">&#10095;</span>
-    <div class="modal-content-wrapper">
-        <img class="modal-content" id="modalImage">
+    <div class="rightcolumn" id="rightcolumn">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+        <form class="mt-4" action="/komentar" method="post" enctype="multipart/form-data" id="comment-form">
+            @csrf
+            <input type="hidden" name="id_soal" value="{{ $soals->id }}">
+            <div class="comment-box">
+                <h2>Komentar</h2>
+                <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
+                <div class="comment-actions">
+                    <label for="file-upload" class="file-upload">
+                        <input type="file" id="file-upload" name="file_komentar[]" accept="image/*" multiple
+                            style="display: none;" onchange="previewImages(event)">
+                        <i class="fa fa-image"></i>
+                    </label>
+                    <button type="button" class="btn btn-info text-light" onclick="submitForm()">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="image-preview" id="image-preview"></div>
+            </div>
+        </form>
+        <select class="sort-comments mt-3 mb-2" id="sort-comments" onchange="sortComments()">
+            <option value="newest" {{ $sort == 'newest' ? 'selected' : '' }}>Terbaru</option>
+            <option value="oldest" {{ $sort == 'oldest' ? 'selected' : '' }}>Terlama</option>
+            <option value="most_rated" {{ $sort == 'most_rated' ? 'selected' : '' }}>Terbanyak Rating</option>
+        </select>
+        <div id="comments-container">
+            @foreach ($komentar_parents as $komentar)
+                    <div class="post" id="post-{{ $komentar->id }}">
+                        <div class="post-header">
+                            <div class="user">
+                                <span style="font-weight:bold;">{{ $user->get($komentar->id_user)->nama }}</span>
+                            </div>
+                            <div class="avg_rating" data-komentar-id="{{ $komentar->id }}">
+                                <span>★</span>
+                                <span>{{ isset($ratingData[$komentar->id]) ? number_format($ratingData[$komentar->id]->avg_rating, 1) : '0.0' }}</span>
+                                <span>({{ isset($ratingData[$komentar->id]) ? $ratingData[$komentar->id]->rating_count : '0' }})</span>
+                            </div>
+                        </div>
+                        <div class="user-level">
+                            @if($user->get($komentar->id_user)->level == 1)
+                                <span>Admin</span>
+                            @elseif($user->get($komentar->id_user)->level == 2)
+                                <span>Dosen</span>
+                            @elseif($user->get($komentar->id_user)->level == 3)
+                                <span>Mahasiswa</span>
+                            @endif
+                            <span>{{ \Carbon\Carbon::parse($komentar->updated_at)->locale('id')->diffForHumans() }}</span>
+                        </div>
+                        <div class="post-content">{{ $komentar->isi_komentar }}</div>
+                        @if ($komentar->file_komentar)
+                                    <div class="comment-images">
+                                        @php
+                                            $images = json_decode($komentar->file_komentar);
+                                            $imageCount = count($images);
+                                        @endphp
+                                        @foreach ($images as $index => $image)
+                                            @if ($index < 2) <a href="javascript:void(0)"
+                                                    onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})">
+                                                    <img src="{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}"
+                                                        alt="Comment Image">
+                                                </a>
+                                            @endif
+                                        @endforeach
+                                        @if ($imageCount > 2)
+                                            <div class="more-images"
+                                                onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $images[2]) }}', 2, {{ json_encode($images) }})">
+                                                +{{ $imageCount - 2 }}</div>
+                                        @endif
+                                        @foreach ($images as $index => $image)
+                                            @if ($index >= 2)
+                                                <a href="javascript:void(0)"
+                                                    onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})"
+                                                    style="display:none;">
+                                                    <img src="{{ Storage::url('public/komentarSoal/' . $komentar->id_soal . '/' . $image) }}"
+                                                        alt="Comment Image">
+                                                </a>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                        @endif
+                        <div class="post-footer">
+                            <div class="rating" data-komentar-id="{{ $komentar->id }}">
+                                @for ($i = 1; $i <= 5; $i++) <span data-rating="{{ $i }}"
+                                    class="{{ isset($ratings[$komentar->id]) && $ratings[$komentar->id]->rating >= $i ? 'selected' : '' }}">★</span>
+                                @endfor
+                            </div>
+                            <div class="comment-button" onclick="showReplyForm({{ $komentar->id }})">Balas</div>
+                            @if(auth()->check() && auth()->user()->level == 1 || auth()->user()->id == $komentar->id_user)
+                                <div class="delete-button" onclick="deleteComment({{ $komentar->id }})">Delete</div>
+                            @else
+                                <div class="delete-button disabled">Delete</div>
+                            @endif
+                        </div>
+                        <div class="reply-form" id="reply-form-{{ $komentar->id }}">
+                            <form action="/komentar" method="post" enctype="multipart/form-data" class="reply-comment-form"
+                                id="reply-comment-form-{{ $komentar->id }}">
+                                @csrf
+                                <input type="hidden" name="id_soal" value="{{ $soals->id }}">
+                                <input type="hidden" name="parent_id" value="{{ $komentar->id }}">
+                                <div class="comment-box">
+                                    <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
+                                    <div class="comment-actions">
+                                        <label for="file-upload-{{ $komentar->id }}" class="file-upload">
+                                            <input type="file" id="file-upload-{{ $komentar->id }}" name="file_komentar[]"
+                                                accept="image/*" multiple style="display: none;"
+                                                onchange="previewImages2(event)">
+                                            <i class="fa fa-image"></i>
+                                        </label>
+                                        <button type="button" class="btn btn-info text-light"
+                                            onclick="submitForm2({{ $komentar->id }})">
+                                            <i class="fa fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                    <div class="image-preview" id="image-preview-{{ $komentar->id }}"></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    @if (isset($komentar_replies[$komentar->id]))
+                        <div class="replies">
+                            @foreach ($komentar_replies[$komentar->id] as $reply)
+                                <div class="comment" id="post-reply-{{ $reply->id }}">
+                                    <div class="comment-header">
+                                        <div class="user">
+                                            <span>{{ $user->get($reply->id_user)->nama }}</span>
+                                        </div>
+                                        <div class="avg_rating" data-komentar-id="{{ $reply->id }}">
+                                            <span>★</span>
+                                            <span>{{ isset($ratingData[$reply->id]) ? number_format($ratingData[$reply->id]->avg_rating, 1) : '0.0' }}</span>
+                                            <span>({{ isset($ratingData[$reply->id]) ? $ratingData[$reply->id]->rating_count : '0' }})</span>
+                                        </div>
+                                    </div>
+                                    <div class="user-level">
+                                        @if($user->get($reply->id_user)->level == 1)
+                                            Admin
+                                        @elseif($user->get($reply->id_user)->level == 2)
+                                            Dosen
+                                        @elseif($user->get($reply->id_user)->level == 3)
+                                            Mahasiswa
+                                        @endif
+                                        <span>{{ \Carbon\Carbon::parse($reply->updated_at)->locale('id')->diffForHumans() }}</span>
+                                    </div>
+                                    <div class="comment-content">{{ $reply->isi_komentar }}</div>
+                                    @if ($reply->file_komentar)
+                                            <div class="comment-images">
+                                                @php
+                                                    $images = json_decode($reply->file_komentar);
+                                                    $imageCount = count($images);
+                                                @endphp
+                                                @foreach ($images as $index => $image)
+                                                    @if ($index < 2) <a href="javascript:void(0)"
+                                                            onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})">
+                                                            <img src="{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}"
+                                                                alt="Comment Image">
+                                                        </a>
+                                                    @endif
+                                                @endforeach
+                                                @if ($imageCount > 2)
+                                                    <div class="more-images"
+                                                        onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $images[2]) }}', 2, {{ json_encode($images) }})">
+                                                        +{{ $imageCount - 2 }}</div>
+                                                @endif
+                                                @foreach ($images as $index => $image)
+                                                    @if ($index >= 2)
+                                                        <a href="javascript:void(0)"
+                                                            onclick="openImageModal('{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}', {{$index}}, {{ json_encode($images) }})"
+                                                            style="display:none;">
+                                                            <img src="{{ Storage::url('public/komentarSoal/' . $reply->id_soal . '/' . $image) }}"
+                                                                alt="Comment Image">
+                                                        </a>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                    @endif
+                                    <div class="comment-footer">
+                                        <div class="rating" data-komentar-id="{{ $reply->id }}">
+                                            @for ($i = 1; $i <= 5; $i++) <span data-rating="{{ $i }}"
+                                                class="{{ isset($ratings[$reply->id]) && $ratings[$reply->id]->rating >= $i ? 'selected' : '' }}">★</span>
+                                            @endfor
+                                        </div>
+                                        @if(auth()->check() && auth()->user()->level == 1)
+                                            <div class="delete-button" onclick="deleteComment({{ $reply->id }})">Delete</div>
+                                        @else
+                                            <div class="delete-button disabled">Delete</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+            @endforeach
+        </div>
     </div>
-</div>
+
+    <!-- The Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeImageModal()">&times;</span>
+        <span class="prev" onclick="changeImage(-1)">&#10094;</span>
+        <span class="next" onclick="changeImage(1)">&#10095;</span>
+        <div class="modal-content-wrapper">
+            <img class="modal-content" id="modalImage">
+        </div>
+    </div>
 </div>
 <script>
     let imageFiles = [];
@@ -238,7 +260,7 @@
             if (!imageFiles.some(existingFile => existingFile.name === file.name && existingFile.size === file.size)) {
                 imageFiles.push(file);
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const imgContainer = document.createElement('div');
                     imgContainer.style.position = 'relative';
 
@@ -249,7 +271,7 @@
                     const removeIcon = document.createElement('span');
                     removeIcon.className = 'remove-icon';
                     removeIcon.innerHTML = '&times;';
-                    removeIcon.onclick = function() {
+                    removeIcon.onclick = function () {
                         const index = imageFiles.indexOf(file);
                         if (index > -1) {
                             imageFiles.splice(index, 1);
@@ -277,7 +299,7 @@
             if (!imageFiles.some(existingFile => existingFile.name === file.name && existingFile.size === file.size)) {
                 imageFiles.push(file);
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const imgContainer = document.createElement('div');
                     imgContainer.style.position = 'relative';
 
@@ -288,7 +310,7 @@
                     const removeIcon = document.createElement('span');
                     removeIcon.className = 'remove-icon';
                     removeIcon.innerHTML = '&times;';
-                    removeIcon.onclick = function() {
+                    removeIcon.onclick = function () {
                         const index = imageFiles.indexOf(file);
                         if (index > -1) {
                             imageFiles.splice(index, 1);
@@ -332,9 +354,9 @@
         // หากข้อมูลถูกต้องให้ส่งฟอร์ม
         if (isValid) {
             fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                })
+                method: 'POST',
+                body: formData
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -375,9 +397,9 @@
         // หากข้อมูลถูกต้องให้ส่งฟอร์ม
         if (isValid) {
             fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                })
+                method: 'POST',
+                body: formData
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -449,7 +471,7 @@
 
     function bindRatingEvents() {
         document.querySelectorAll('.rating span').forEach(star => {
-            star.addEventListener('click', function() {
+            star.addEventListener('click', function () {
                 let rating = this.getAttribute('data-rating');
                 let komentarId = this.parentNode.getAttribute('data-komentar-id');
                 let stars = this.parentNode.children;
@@ -462,16 +484,16 @@
                 }
 
                 fetch('{{ route("submit.rating") }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            id_komentar: komentarId,
-                            rating: rating
-                        })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        id_komentar: komentarId,
+                        rating: rating
                     })
+                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -488,7 +510,7 @@
                     });
             });
 
-            star.addEventListener('mouseover', function() {
+            star.addEventListener('mouseover', function () {
                 let rating = this.getAttribute('data-rating');
                 let stars = this.parentNode.children;
                 for (let i = 0; i < stars.length; i++) {
@@ -500,7 +522,7 @@
                 }
             });
 
-            star.addEventListener('mouseout', function() {
+            star.addEventListener('mouseout', function () {
                 let stars = this.parentNode.children;
                 for (let i = 0; i < stars.length; i++) {
                     stars[i].classList.remove('hover');
@@ -509,7 +531,7 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         bindRatingEvents();
     });
 
@@ -536,12 +558,12 @@
     function deleteComment(commentId) {
         if (confirm('คุณต้องการลบคอมเม้นนี้หรือไม่?')) {
             fetch(`/komentar/${commentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
-                    }
-                })
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

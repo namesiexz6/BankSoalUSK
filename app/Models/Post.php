@@ -23,6 +23,9 @@ class Post extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
+    public function loves()
+    {
+        return $this->hasMany(LovePost::class, 'id_post');
+    }
  
 }
