@@ -12,7 +12,7 @@ class Soal extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'nama',
+        'id_user',
         'id_mk',
         'nama_soal',
         'tipe',
@@ -23,4 +23,8 @@ class Soal extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
 }

@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <style>
         body {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         .nav-link {
@@ -38,21 +38,21 @@
             <a href="/manageSemester" class="w3-bar-item w3-button">Manajemen Semester</a>
             <a href="/manageProdi" class="w3-bar-item w3-button">Manajemen Prodi</a>
             <a href="/manageFakultas" class="w3-bar-item w3-button">Manajemen Fakultas</a>
-            <a href="/manageJenjang" class="w3-bar-item w3-button">Manajemen Janjang</a>
+            <a href="/manageJenjang" class="w3-bar-item w3-button">Manajemen Jenjang</a>
         @elseif(auth()->check() && auth()->user()->level == 2)
             <a href="/manageSoal" class="w3-bar-item w3-button">Manajemen Soal</a>
             <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Matakuliah</a>
             <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Semester</a>
             <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Prodi</a>
             <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Fakultas</a>
-            <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Janjang</a>
+            <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Jenjang</a>
         @else
             <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Soal</a>
             <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Matakuliah</a>
             <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Semester</a>
             <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Prodi</a>
             <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Fakultas</a>
-            <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Janjang</a>
+            <a href="#" class="w3-bar-item w3-button w3-disabled">Manajemen Jenjang</a>
         @endif
     </div>
     @yield('content')

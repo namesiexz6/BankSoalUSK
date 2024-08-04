@@ -49,29 +49,26 @@ class SearchSoalController extends Controller
     }
     public function cariSemester(Request $request)
     {
-
-
         $id_semester = $request->input("semester");
         $s = Semester::where("id", $id_semester)->firstOrFail();
-
+    
         session()->put("semester", $id_semester);
         session()->put("semester_nama", $s->nama);
         session()->put("jenjang", $request->input("jenjang"));
         session()->put("fakultas", $request->input("fakultas"));
         session()->put("prodi", $request->input("prodi"));
         session()->put("semester", $id_semester);
-
-        $jenjang = Jenjang::all();
-        $fakultas = Fakultas::all();
-        $prodi = Prodi::all();
-        $semester = Semester::all();
+    
         $multi_mk = multi_mk::where("id_semester", $id_semester)->orderBy("id_mk", "asc")->get();
         $matakuliah = Matakuliah::whereIn("id", $multi_mk->pluck('id_mk')->toArray())->orderBy("id", "asc")->get();
         $sks = $matakuliah->sum('sks');
-
-        return view("semester", compact('jenjang', 'fakultas', 'prodi', 'semester', 'matakuliah', 'sks'));
+    
+        // สร้าง view fragment
+        $html = view('partials.matakuliah', compact('matakuliah', 'sks'))->render();
+    
+        return response()->json(['html' => $html]);
     }
-
+    
 
     public function cariJenjang(Request $request)
     {

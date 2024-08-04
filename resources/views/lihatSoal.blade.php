@@ -225,7 +225,7 @@
                                                 class="{{ isset($ratings[$reply->id]) && $ratings[$reply->id]->rating >= $i ? 'selected' : '' }}">★</span>
                                             @endfor
                                         </div>
-                                        @if(auth()->check() && auth()->user()->level == 1)
+                                        @if(auth()->check() && (auth()->user()->level == 1 || auth()->user()->id == $reply->id_user))
                                             <div class="delete-button" onclick="deleteComment({{ $reply->id }})">Delete</div>
                                         @else
                                             <div class="delete-button disabled">Delete</div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\SearchSoalController;
 use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NotificationController;
 
 Route::get("/", function () {
     return view("homepage");
@@ -31,11 +32,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post("/search3", [SearchSoalController::class, 'cariSemester'])->name("cariSemester");
     Route::post("/search4", [SearchSoalController::class, 'cariMatakuliah'])->name("cariMatakuliah");
 
-    Route::get("/soal", [SoalsController::class, 'showsoal'])->name("tamplikansoal");
-    Route::post("/soal", [SoalsController::class, 'showsoal'])->name("pilihsoal");
+    Route::get("/soal/{matakuliah_id}", [SoalsController::class, 'showsoal'])->name("tamplikansoal");
 
-    Route::get("/lihatsoal", [SoalsController::class, 'lihatsoal'])->name("tamplikanhHsoal");
-    Route::post("/lihatsoal", [SoalsController::class, 'lihatsoal'])->name("pilihHsoal");
+    Route::get("/lihatsoal/{soal_id}", [SoalsController::class, 'lihatsoal'])->name("tamplikanhHsoal");
     Route::post("/komentar", [SoalsController::class, 'komentar']);
     Route::delete('/komentar/{id}', [SoalsController::class, 'deleteComment'])->name('komentar.delete');
 
@@ -88,8 +87,8 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-    Route::get('/thread', [PostController::class, 'index'])->name('post.index');
-    Route::post('/thread', [PostController::class, 'index'])->name('post.index');
+    Route::get('/thread/{id_mk}', [PostController::class, 'index'])->name('post.index');
+    Route::post('/thread', [PostController::class, 'index'])->name('posts.index');
     Route::post('/post', [PostController::class, 'addPost'])->name('post.store');
     Route::get('/posts', [PostController::class, 'loadPosts'])->name('posts.load');
     Route::delete('/post/{id}', [PostController::class, 'destroyPost'])->name('post.destroy');
@@ -98,12 +97,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/love/{id}', [PostController::class, 'addLove']);
     Route::post('/unlove/{id}', [PostController::class, 'destroyLove']);
-
-
     Route::post('/komentar-post/sort', [PostController::class, 'sortComments'])->name('komentar-post.sort');
-
-    // Route สำหรับการโหลดคอมเม้นต์ของโพสต์
     Route::get('/komentar-post/{post_id}', [PostController::class, 'loadComments'])->name('komentar-post.load');
+
+    Route::delete('notifications/{id}', [NotificationController::class, 'deleteNotification'])->name('notification.delete');
+    Route::post('/subscribe', [NotificationController::class, 'subscribe'])->name('subscribe');
+    Route::get('/check-subscription/{mkId}', [NotificationController::class, 'checkSubscription'])->name('check.subscription');
+    Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications');
+    Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+   
+
 
 });
 

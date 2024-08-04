@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id();
-            $table->string('nama', 255)->notNullable();
+            $table->unsignedBigInteger('id_user')->notNullable();
             $table->unsignedBigInteger('id_mk');
             $table->foreign('id_mk')->references('id')->on('matakuliah');
             $table->string('nama_soal', 255)->notNullable();

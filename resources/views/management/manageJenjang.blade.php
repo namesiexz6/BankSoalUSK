@@ -19,12 +19,13 @@
 </head>
 <div style="margin-left:15%">
 
-    <div class="w3-container w3-light-blue">
-        <h1>Manajemen Janjang</h1>
-    </div>
+<div class="background"
+  style="background-image: url('{{  asset('background.png') }}'); background-size: cover; background-position: top; height: 10vh; display: flex; align-items: center; justify-content: center;">
+  <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">Manajemen Jenjang</h2>
+</div>
 
     <div style="margin-left:10px; margin-right:10px;">
-        <h2 class="mt-5">Daftar Janjang</h2>
+        <h2 class="mt-3">Daftar Jenjang</h2>
         <table class="table table-bordered table-light table-striped my-3">
             <thead class="table-dark">
                 <input type="hidden" name="id_fakultas" value="1">
@@ -33,7 +34,7 @@
                 </tr>
                 <tr>
                     <th scope="col">No</th>
-                    <th scope="col">Nama Janjang</th>
+                    <th scope="col">Nama Jenjang</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -74,7 +75,7 @@
         <form action="{{ route('tambahJenjangM') }}" method="post" enctype="multipart/form-data">
 
             @csrf
-            <h1>Tambah Janjang</h1>
+            <h1>Tambah Jenjang</h1>
             <label class="form-label mt-3">Nama Janjang:</label>
             <input class="form-control" name="nama_jenjang" id="nama_jenjang" type="text" placeholder="ex: S1" required>
 
@@ -87,7 +88,7 @@
         <form action="{{ route('jenjangM') }}" method="post" enctype="multipart/form-data">
 
             @csrf
-            <h1>Edit Janjang</h1>
+            <h1>Edit Jenjang</h1>
             <input type="hidden" name="edit" value="1">
             <label class="form-label mt-3">Nama Janjang:</label>
             <input type="hidden" name="jenjang_id" id="jenjang_id" value="">

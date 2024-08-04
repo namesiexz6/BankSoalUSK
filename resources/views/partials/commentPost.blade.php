@@ -1,7 +1,5 @@
-
 @foreach ($komentar_parents as $komentar)
     @if ($komentar->id_post == $post_id)
-
         <div class="comment">
             <div class="comment-header">
                 <div class="user">
@@ -74,7 +72,7 @@
 
             <div class="reply-form" id="reply-form-{{ $komentar->id }}">
                 <form action="/komentar-post" method="post" enctype="multipart/form-data" class="reply-comment-form"
-                    id="reply-comment-form-{{ $post_id }}">
+                    id="reply-comment-form-{{ $komentar->id }}">
                     @csrf
                     <input type="hidden" name="id_post" value="{{ $komentar->id_post }}">
                     <input type="hidden" name="parent_id" value="{{ $komentar->id }}">
@@ -86,7 +84,7 @@
                                     multiple style="display: none;" onchange="previewImages2(event)">
                                 <i class="fa fa-image"></i>
                             </label>
-                            <button type="button" class="btn btn-info text-light" onclick="submitForm3({{ $post_id }})">
+                            <button type="button" class="btn btn-info text-light" onclick="submitForm3({{ $komentar->id}},{{$post_id}})">
                                 <i class="fa fa-paper-plane"></i>
                             </button>
                         </div>
@@ -96,9 +94,9 @@
             </div>
         </div>
         @if (isset($komentar_replies[$komentar->id]))
-            <div class="replies">
-                @foreach ($komentar_replies[$komentar->id] as $reply)
-                    <div class="reply-comment">
+            <div class="replies" id="replies-container-{{ $komentar->id }}">
+                @foreach ($komentar_replies[$komentar->id] as $index => $reply)
+                    <div class="reply-comment" style="{{ $index >= 1 ? 'display: none;' : '' }}">
                         <div class="reply-comment-header">
                             <div class="user">
                                 <span>{{ $user->get($reply->id_user)->nama }}</span>
@@ -160,7 +158,7 @@
                                         class="{{ isset($ratings[$reply->id]) && $ratings[$reply->id]->rating >= $i ? 'selected' : '' }}">★</span>
                                 @endfor
                             </div>
-                            @if(auth()->check() && auth()->user()->level == 1)
+                            @if(auth()->check() && (auth()->user()->level == 1 || auth()->user()->id == $reply->id_user))
                                 <div class="delete-button" onclick="deleteComment({{ $reply->id }})">Delete</div>
                             @else
                                 <div class="delete-button disabled">Delete</div>
@@ -168,6 +166,11 @@
                         </div>
                     </div>
                 @endforeach
+                @if (count($komentar_replies[$komentar->id]) > 1)
+                    <div id="show-more-{{ $komentar->id }}" class="show-more" onclick="showMoreReplies({{ $komentar->id }})">
+                        Show more
+                    </div>
+                @endif
             </div>
         @endif
     @endif

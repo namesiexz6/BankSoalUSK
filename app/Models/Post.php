@@ -27,5 +27,9 @@ class Post extends Model
     {
         return $this->hasMany(LovePost::class, 'id_post');
     }
+    public function Matakuliah()
+    {
+        return $this->belongsTo(Matakuliah::class, 'id_mk');
+    }
  
 }

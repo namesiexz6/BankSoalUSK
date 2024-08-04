@@ -7,6 +7,8 @@ use App\Models\Matakuliah;
 use App\Models\KomentarSoal;
 use App\Models\rating_komentar;
 use App\Models\User;
+use App\Models\NotificationSubscription;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -25,7 +27,7 @@ class SoalsController extends Controller
     
         $id_mk = $request->input("matakuliah2");
         $nama_soal = $request->input("nama_soal");
-        $nama = auth()->user()->nama;
+        $id_user = Auth::id();;
     
         if ($isi_soal) {
             // Check if the file size exceeds 5MB
@@ -39,14 +41,14 @@ class SoalsController extends Controller
     
             $tipe = 1;
             Soal::create([
-                'nama' => $nama,
+                'id_user' => $id_user,
                 'id_mk' => $id_mk,
                 'nama_soal' => $nama_soal,
                 'tipe' => $tipe,
                 'isi_soal' => $fileName
             ]);
     
-            return redirect("/manageSoal");
+            
         } else {
             if (!$isi_soaltext) {
                 return redirect("/manageSoal");
@@ -56,39 +58,50 @@ class SoalsController extends Controller
                 Storage::disk('public')->makeDirectory('html');
             }
             $tipe = 2;
-            $fileName = time() . '_' . $nama_soal . '_' . $nama . '.html';
+            $fileName = time() . '_' . $nama_soal . '_' . $id_user . '.html';
             Storage::disk('public')->put('html/' . $fileName, $isi_soaltext);
     
             Soal::create([
-                'nama' => $nama,
+                'id_user' => $id_user,
                 'id_mk' => $id_mk,
                 'nama_soal' => $nama_soal,
                 'tipe' => $tipe,
                 'isi_soal' => $fileName
-            ]);
-    
-            return redirect("/manageSoal");
+            ]);          
         }
+        $subscription = NotificationSubscription::where('id_mk', $id_mk)->get();
+        
+        foreach ($subscription as $sub) {
+            $nama = Auth::user()->nama;
+            Notification::create([
+                'user_id' => $sub->user_id,
+                'type' => 'new_soal',
+                'data' => json_encode([
+                    'message' => 'Matakuliah ' . Matakuliah::find($id_mk)->nama . ' telah ditambah soal baru  oleh ' . $nama,
+                    'url' => route('tamplikansoal', $id_mk)
+
+                ])
+            ]);
+        }
+
+        return redirect("/manageSoal");
     }
     
 
-    public function showsoal(Request $request)
+    public function showsoal($matakuliah_id)
     {
-        $id_mk = $request->input("matakuliah_id");
-        $mk = Matakuliah::where("id", $id_mk)->orderBy("id", "asc")->firstOrFail();
-        $soal = Soal::where("id_mk", $id_mk)->orderBy("id", "asc")->get();
-        $id = $request->input("edit");
-
-
+        $mk = Matakuliah::where("id", $matakuliah_id)->orderBy("id", "asc")->firstOrFail();
+        $soal = Soal::where("id_mk", $matakuliah_id)->orderBy("id", "asc")->with('user')->get();
+    
         session()->put("namamk", $mk->nama);
-        session()->put("id_matakuliah", $id_mk);
-
-        return view("soal", compact('soal'));
+        session()->put("id_matakuliah", $matakuliah_id);
+    
+        return view("soal", compact('soal', 'matakuliah_id'));
     }
 
-    public function lihatsoal(Request $request)
+    public function lihatsoal(Request $request, $id_soal)
     {
-        $id_soal = $request->input("soals_id");
+     
             
         if($id_soal == null){
             $id_soal = session()->get("id_soal");
@@ -172,6 +185,36 @@ class SoalsController extends Controller
         }
     
         $komentar->save();
+        
+        $id_soal = $request->id_soal;
+        $owner = Soal::find($request->id_soal)->id_user;
+        if($owner != Auth::id()){
+            $namaKomen = Auth::user()->nama;
+                Notification::create([
+                    'user_id' => $owner,
+                    'type' => 'new_comment_soal',
+                    'data' => json_encode([
+                        'message' =>$namaKomen. ' telah memberikan komentar pada soal yang anda buat: '. $komentar->isi_komentar,
+                        'url' => route('tamplikanhHsoal', $id_soal).'#comment-'.$komentar->id,
+                    ])
+                ]);
+            }
+        if ($request->filled('parent_id')) {
+            $parentComment = KomentarSoal::find($request->parent_id);
+            $owner = $parentComment->id_user;
+            if($owner != Auth::user()->nama){
+                $namaKomen = Auth::user()->nama;
+                Notification::create([
+                    'user_id' => $owner,
+                    'type' => 'new_reply_soal',
+                    'data' => json_encode([
+                        'message' =>$namaKomen. ' telah memberikan balasan pada komentar anda: '. $komentar->isi_komentar,
+                        'url' => route('tamplikanhHsoal', $id_soal).'#comment-'.$komentar->id,
+                    ])
+                ]);
+            }
+        }
+        
     
         return response()->json(['success' => true]);
     }

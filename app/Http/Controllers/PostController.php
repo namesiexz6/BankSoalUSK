@@ -7,15 +7,16 @@ use App\Models\rating_komentar_post;
 use App\Models\User;
 use App\Models\KomentarPost;
 use App\Models\LovePost;
+use App\Models\NotificationSubscription;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $id_mk)
     {
-        $id_mk = $request->input("id_mk");
         if ($id_mk == null) {
             $id_mk = session()->get("id_matakuliah");
         }
@@ -35,11 +36,11 @@ class PostController extends Controller
 
         $sort = $request->input('sort', 'newest');
 
-        if($sort == 'newest'){
+        if ($sort == 'newest') {
             $posts = Post::where("id_mk", $id_mk)->orderBy("created_at", "desc")->get();
-        }elseif($sort == 'oldest'){
+        } elseif ($sort == 'oldest') {
             $posts = Post::where("id_mk", $id_mk)->orderBy("created_at", "asc")->get();
-        }elseif($sort == 'most_rated'){
+        } elseif ($sort == 'most_rated') {
             $posts = Post::where("id_mk", $id_mk)
                 ->leftJoin('love_post', 'post.id', '=', 'love_post.id_post')
                 ->selectRaw('post.*, COUNT(love_post.id) as love_count')
@@ -71,10 +72,10 @@ class PostController extends Controller
         $komentar_parents = $komentar_post->whereNull('parent_id');
         $komentar_replies = $komentar_post->whereNotNull('parent_id')->groupBy('parent_id');
         if ($request->ajax()) {
-            return view('partials.posts', compact('posts', 'komentar_parents', 'komentar_replies', 'user', 'userPost', 'usernow', 'ratings', 'ratingData', 'commentSort','sort'))->render();
+            return view('partials.posts', compact('posts', 'komentar_parents', 'komentar_replies', 'user', 'userPost', 'usernow', 'ratings', 'ratingData', 'commentSort', 'sort'))->render();
         }
 
-        return view("threadpage", compact('posts', 'komentar_parents', 'komentar_replies', 'user', 'userPost', 'usernow', 'ratings', 'ratingData', 'commentSort','sort'));
+        return view("threadpage", compact('posts', 'komentar_parents', 'komentar_replies', 'user', 'userPost', 'usernow', 'ratings', 'ratingData', 'commentSort', 'sort'));
     }
 
     private function sortCommentsQuery($post_ids, $commentSort)
@@ -145,7 +146,6 @@ class PostController extends Controller
         return response()->json(['success' => true, 'commentsHtml' => $commentsHtml]);
     }
 
-
     public function addPost(Request $request)
     {
         $request->validate([
@@ -159,6 +159,7 @@ class PostController extends Controller
         $post->id_user = Auth::id();
         $post->isi_post = $request->isi_post;
         $post->save();
+
         $images = [];
         if ($request->hasfile('file_post')) {
             $destinationPath = 'public/post/' . $post->id_mk;
@@ -172,6 +173,25 @@ class PostController extends Controller
             $post->file_post = json_encode($images);
         }
 
+        $id_mk = $request->id_mk;
+        // ดึงรายการผู้ใช้ที่ subscribe
+        $subscribers = NotificationSubscription::where('id_mk', $id_mk)->orderBy("id", "asc")->get();
+        $mataKuliahNama = $post->mataKuliah->nama;  // ดึงชื่อ MataKuliah
+
+        // ส่งการแจ้งเตือนให้กับผู้ใช้ที่ subscribe
+        foreach ($subscribers as $subscriber) {
+            if ($subscriber->user_id != Auth::id()) {
+                Notification::create([
+                    'user_id' => $subscriber->user_id,
+                    'type' => 'new_post',
+                    'data' => json_encode([
+                        'message' => 'Ada postingan baru di thread mata kuliah ' . $mataKuliahNama . ': ' . $post->isi_post,
+                        'post_id' => $post->id,
+                        'url' => route('post.index', $id_mk).'#post-'.$post->id,
+                    ]),
+                ]);
+            }
+        }
         $post->save();
 
         return response()->json(['success' => true]);
@@ -259,7 +279,41 @@ class PostController extends Controller
             $komentar->file_komentar = json_encode($images);
         }
 
+
         $komentar->save();
+        $id_mk = Post::find($request->id_post)->id_mk;
+
+        $owner = Post::find($request->id_post)->id_user;
+        if ($owner != Auth::id()) {
+            $namaKomen = Auth::user()->nama;
+            Notification::create([
+                'user_id' => $owner,
+                'type' => 'new_comment',
+                'data' => json_encode([
+                    'message' => $namaKomen . ' telah memberikan komentar pada postingan anda : ' . $komentar->isi_komentar,
+                    'post_id' => $request->id_post,
+                    'comment_id' => $komentar->id,
+                    'url' => route('post.index', $id_mk).'#post-'.$request->id_post,
+                ]),
+            ]);
+        }
+        if ($request->filled('parent_id')) {
+            $parent = KomentarPost::find($request->parent_id);
+            $owner = $parent->id_user;
+            if ($owner != Auth::id()) {
+                $namaKomen = Auth::user()->nama;
+                Notification::create([
+                    'user_id' => $owner,
+                    'type' => 'new_reply',
+                    'data' => json_encode([
+                        'message' => $namaKomen . ' membalas komen anda : ' . $komentar->isi_komentar,
+                        'post_id' => $request->id_post,
+                        'comment_id' => $komentar->id,
+                        'url' => route('post.index', $id_mk).'#post-'.$request->id_post,
+                    ]),
+                ]);
+            }
+        }
 
         return response()->json(['success' => true]);
     }
