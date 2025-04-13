@@ -26,6 +26,7 @@ RUN composer install --optimize-autoloader --no-dev
 RUN chmod -R 777 storage bootstrap/cache
 
 # รัน Laravel Server
-CMD php artisan serve --host=0.0.0.0 --port=8000
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
+
 
 EXPOSE 8000
