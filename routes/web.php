@@ -19,7 +19,7 @@ Route::get("/test", function () {
 Route::get("/register", function () {
     return view("register");
 });
-Route::post("/register", [AuthController::class, 'register'])->name("register");
+
 
 
 Route::middleware(['auth'])->group(function () {
