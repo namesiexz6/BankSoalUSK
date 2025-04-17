@@ -145,10 +145,6 @@ class SoalsController extends Controller
         $komentar_parents = $komentar_soal->whereNull('parent_id');
         $komentar_replies = $komentar_soal->whereNotNull('parent_id')->groupBy('parent_id');
     
-        if ($request->ajax()) {
-            return view('partials.comments', compact('komentar_parents', 'komentar_replies', 'user', 'ratings', 'ratingData', 'sort'))->render();
-        }
-    
         return view("lihatsoal", compact('soal', 'komentar_parents', 'komentar_replies', 'user', 'usernow', 'ratings', 'ratingData', 'sort'));
     }
     

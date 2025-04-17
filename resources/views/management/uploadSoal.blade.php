@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="app()->getLocale()">
 
 <head>
     <meta charset="UTF-8">
@@ -37,20 +37,20 @@
 
                     <div class="col-md-3">
                         @csrf
-                        <h1>Tambah Mata kuliah</h1>
+                        <h1>{{ __('management.tambah_soal') }}</h1>
 
-                        <label class="form-label mt-3">Nama Soal:</label><br>
+                        <label class="form-label mt-3">{{ __('management.nama_soal') }}:</label><br>
                         <input class="form-control" name="nama_soal" id="nama_soal" type="text" placeholder="ex : Latihan 1" required>
                     </div>
                     <div class="col-md-3">
                         <div id="fileOptions" class="tab">
-                            <button class="tablinks active" onclick="toggleFileOption(event, 'upload')">Upload File</button>
-                            <button class="tablinks" onclick="toggleFileOption(event, 'textarea')">Text Editor</button>
+                            <button class="tablinks active" onclick="toggleFileOption(event, 'upload')">{{ __('management.upload_file') }}</button>
+                            <button class="tablinks" onclick="toggleFileOption(event, 'textarea')">{{ __('management.text_editor') }}</button>
                         </div>
 
                         <!-- input file และ textarea -->
                         <div id="upload" class="tabcontent" style="display: block;">
-                            <label class="form-label mt-3">Pilih File:</label>
+                            <label class="form-label mt-3">{{ __('management.pilih_file') }}:</label>
                             <input class="form-control" type="file" name="formFile" id="formFile" accept=".pdf">
                         </div>
                         <div id="textarea" class="tabcontent" style="display: none;">
@@ -58,44 +58,45 @@
                         </div>
                     </div>
                     <div class="col-md-3"><br>
-                        <label for="jenjang2" class="form-label mt-3">Pilih alamat:</label> <br>
+                        <label for="jenjang2" class="form-label mt-3">{{ __('management.pilih_alamat') }}:</label> <br>
                         <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2">
-                            <option value="">-- Pilih Janjang --</option>
+                            <option value="">-- {{ __('management.pilih_jenjang') }} --</option>
                             @foreach ($jenjang as $jj)
                             <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
                             @endforeach
                         </select>
                         <select class="form-control" aria-label="Default select" name="fakultas2" id="fakultas2">
-                            <option value="">-- Pilih Fakultas --</option>
+                            <option value="">-- {{ __('management.pilih_fakultas') }} --</option>
                             @foreach ($fakultas as $f)
                             <option value="{{ $f->id }}">{{ $f->nama }}</option>
                             @endforeach
                         </select>
                         <select class="form-control" aria-label="Default select" name="prodi2" id="prodi2">
-                            <option value="">-- Pilih Prodi --</option>
+                            <option value="">-- {{ __('management.pilih_prodi') }} --</option>
                             @foreach ($prodi as $p)
                             <option value="{{ $p->id }}">{{ $p->nama }}</option>
                             @endforeach
                         </select>
                         <select class="form-control" aria-label="Default select" name="semester2" id="semester2">
-                            <option value="">-- Pilih Semester --</option>
+                            <option value="">-- {{ __('management.pilih_semester') }} --</option>
                             @foreach ($semester as $s)
                             <option value="{{ $s->id }}">{{ $s->nama }}</option>
                             @endforeach
                         </select>
                         <select class="form-control" aria-label="Default select" name="matakuliah2" id="matakuliah2" required>
-                            <option value="">-- Pilih Matakuliah --</option>
+                            <option value="">-- {{ __('management.pilih_matakuliah') }} --</option>
                             @foreach ($matakuliah as $m)
                             <option value="{{ $m->id }}">{{ $m->nama }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <button class="buttonadd mt-3" id="submitButton" type="submit">Submit</button>
-                    <button class="buttoncancel mt-3" type="button" id="backButton">Batal</button>
+                    <button class="buttonadd mt-3" id="submitButton" type="submit">{{ __('management.submit') }}</button>
+                    <button class="buttoncancel mt-3" type="button" id="backButton">{{ __('management.batal') }}</button>
                 </div>
             </form>
         </div>
     </div>
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
@@ -213,12 +214,12 @@
                     },
                     dataType: 'json',
                     success: function(result) {
-                        fakultas.innerHTML = '<option value="">-- Pilih Fakultas --</option>';
+                        fakultas.innerHTML = '<option value="">-- {{ __('management.pilih_fakultas') }} --</option>';
                         console.log(result);
                         $.each(result.fakultas, function(key, value) {
                             fakultas.innerHTML += '<option value="' + value.id + '">' + value.nama + '</option>';
                         });
-                        prodi.innerHTML = '<option value="">-- Pilih Prodi --</option>';
+                        prodi.innerHTML = '<option value="">-- {{ __('management.pilih_prodi') }} --</option>';
                     }
                 });
             });
@@ -235,12 +236,12 @@
                     },
                     dataType: 'json',
                     success: function(result) {
-                        prodi.innerHTML = '<option value="">-- Pilih Prodi --</option>';
+                        prodi.innerHTML = '<option value="">-- {{ __('management.pilih_prodi') }} --</option>';
                         console.log(result);
                         $.each(result.prodi, function(key, value) {
                             prodi.innerHTML += '<option value="' + value.id + '">' + value.nama + '</option>';
                         });
-                        semester.innerHTML = '<option value="">-- Pilih Semester --</option>';
+                        semester.innerHTML = '<option value="">-- {{ __('management.pilih_semester') }} --</option>';
                     }
                 });
             });
@@ -257,12 +258,12 @@
                     },
                     dataType: 'json',
                     success: function(result) {
-                        semester.innerHTML = '<option value="">-- Pilih Semester --</option>';
+                        semester.innerHTML = '<option value="">-- {{ __('management.pilih_semester') }} --</option>';
                         console.log(result);
                         $.each(result.semester, function(key, value) {
                             semester.innerHTML += '<option value="' + value.id + '">' + value.nama + '</option>';
                         });
-                        matakuliah.innerHTML = '<option value="">-- Pilih Matakuliah --</option>';
+                        matakuliah.innerHTML = '<option value="">-- {{ __('management.pilih_matakuliah') }} --</option>';
                     }
                 });
             });
@@ -278,7 +279,7 @@
                     },
                     dataType: 'json',
                     success: function(result) {
-                        matakuliah.innerHTML = '<option value="">-- Pilih Matakuliah --</option>';
+                        matakuliah.innerHTML = '<option value="">-- {{ __('management.pilih_matakuliah') }} --</option>';
                         console.log(result);
                         $.each(result.matakuliah, function(key, value) {
                             matakuliah.innerHTML += '<option value="' + value.id + '">' + value.nama + '</option>';

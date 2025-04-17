@@ -33,30 +33,35 @@
 </head>
 <div class="background"
   style="background-image: url('{{  asset('background.png') }}'); background-size: cover; background-position: top; height: 20vh; display: flex; align-items: center; justify-content: center;">
-  <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">Mata Kuliah {{session('namamk')}}
-  </h2>
+  @if(app()->getLocale() == 'id')
+  <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">{{ __('soal.mata_kuliah') }} {{ session('namamk') }}</h2>
+  @else
+  <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;"> {{ session('namamk') }} {{ __('soal.mata_kuliah') }}</h2>
+  @endif
   <i class="fa fa-bell notification-icon" id="notificationBell" data-mk-id="{{ session('id_matakuliah') }}"></i>
 </div>
 <div class="container mt-3">
   
-  
 <div class="thread-button-container">
-    
-<h2 class="mb3">Daftar Soal</h2>
-<a href="{{ route('post.index', ['id_mk' => session('id_matakuliah')]) }}" class="btn btn-info text-light" style="background-color: rgba(37, 144, 251, 1); font-size: larger">Thread</a>
+    <h2 class="mb3">{{ __('soal.daftar_soal') }}</h2>
+    <a href="{{ route('post.index', ['id_mk' => session('id_matakuliah')]) }}" class="btn btn-info text-light" style="background-color: rgba(37, 144, 251, 1); font-size: larger">{{ __('soal.thread') }}</a>
+</div>
 
-  </div>
   <table class="table table-bordered table-light table-striped">
     <thead class="table-dark">
       <input type="hidden" name="id_semester" value="1">
       <tr>
-        <th colspan="5">Mata Kuliah {{session('namamk')}}</th>
+        @if(app()->getLocale() == 'id')
+        <th colspan="5">{{ __('soal.mata_kuliah') }} {{ session('namamk') }}</th>
+        @else
+        <th colspan="5">{{ session('namamk') }} {{ __('soal.mata_kuliah') }}</th>
+        @endif
       </tr>
       <tr>
-        <th scope="col">No</th>
-        <th scope="col">Nama Soal</th>
-        <th scope="col">Dibuat Oleh</th>
-        <th scope="col">Update</th>
+        <th scope="col">{{ __('soal.no') }}</th>
+        <th scope="col">{{ __('soal.nama_soal') }}</th>
+        <th scope="col">{{ __('soal.dibuat_oleh') }}</th>
+        <th scope="col">{{ __('soal.update') }}</th>
         <th scope="col"></th>
       </tr>
     </thead>
@@ -66,14 +71,16 @@
         <th scope="row">{{ $loop->iteration }}</th>
         <td>{{ $soals->nama_soal }}</td>
         <td>{{ $soals->user->nama }}</td>
-        <td>{{ \Carbon\Carbon::parse($soals->updated_at)->locale('id')->diffForHumans() }}</td>
+        <td>{{ \Carbon\Carbon::parse($soals->updated_at)->locale(app()->getLocale())->diffForHumans() }}</td>
+
         <td>
-        <a href="{{ route('tamplikanhHsoal', ['soal_id' => $soals->id]) }}" class="btn btn-info text-light" style="background-color: #134F5C;">Lihat</a>
+        <a href="{{ route('tamplikanhHsoal', ['soal_id' => $soals->id]) }}" class="btn btn-info text-light" style="background-color: #134F5C;">{{ __('soal.lihat') }}</a>
       </tr>
       @endforeach
     </tbody>
   </table>
 </div>
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
       const notificationBell = document.getElementById('notificationBell');

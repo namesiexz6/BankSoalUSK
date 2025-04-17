@@ -66,7 +66,7 @@
         <div class="modal-body p-5 pt-0">
           <main class="form-signin">
             <br>
-            <h1 class="h3 mb-3 fw-normal text-center">Please Login</h1></br>
+            <h1 class="h3 mb-3 fw-normal text-center">LOGIN</h1></br>
             <form action="/login" method="post">
               @csrf
               <div class="form-floating">

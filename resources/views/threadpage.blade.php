@@ -14,12 +14,10 @@
     <style>
         .nav-link {
             font-size: 18px;
-            /* ขนาดของฟอนต์ */
         }
 
         .navbar-brand img {
             width: 120px;
-            /* ขนาดโลโก้ */
         }
 
         .header {
@@ -52,18 +50,14 @@
             border: none;
             cursor: pointer;
             color: #ffcccc;
-            /* Lighter color for unliked state */
             font-size: 24px;
             transition: color 0.3s ease;
             vertical-align: middle;
-            /* Align the button vertically with the text */
             padding: 0;
-            /* Remove default padding */
         }
 
         .love-button.loved {
             color: #ff4d4d;
-            /* Darker color for liked state */
         }
 
         .love-count {
@@ -71,24 +65,27 @@
             font-weight: bold;
             font-size: 18px;
             vertical-align: middle;
-            /* Align the text vertically with the button */
         }
     </style>
 </head>
 
 <body>
-    <div class="background" style="background-image: url('{{  asset('background.png') }}'); background-size: cover; background-position: top; height: 20vh; display: flex; align-items: center; justify-content: center;">
-        <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">Mata Kuliah {{session('namamk')}}</h2>
+    <div class="background" style="background-image: url('{{ asset('background.png') }}'); background-size: cover; background-position: top; height: 20vh; display: flex; align-items: center; justify-content: center;">
+    @if(app()->getLocale() == 'en')    
+    <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">{{ session('namamk') }} {{ __('post.matakuliah') }}</h2>
+    @else
+    <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">{{ __('post.matakuliah') }} {{ session('namamk') }}</h2>
+    @endif
     </div>
     <div class="container" id="post-container">
         <div class="content">
             <div class="button-container">
-                <button class="buttonadd mt-3" type="button" onclick="openRegisterForm()" style="background-color: #134F5C"> Buat postingan Baru</button>
+                <button class="buttonadd mt-3" type="button" onclick="openRegisterForm()" style="background-color: #134F5C">{{ __('post.buat_postingan_baru') }}</button>
             </div>
             <select class="sort-comments mt-3 mb-2" id="sort-posts" onchange="sortPosts()">
-                <option value="newest" {{ $sort == 'newest' ? 'selected' : '' }}>Terbaru</option>
-                <option value="oldest" {{ $sort == 'oldest' ? 'selected' : '' }}>Terlama</option>
-                <option value="most_rated" {{ $sort == 'most_rated' ? 'selected' : '' }}>Terbanyak Rating</option>
+                <option value="newest" {{ $sort == 'newest' ? 'selected' : '' }}>{{ __('post.terbaru') }}</option>
+                <option value="oldest" {{ $sort == 'oldest' ? 'selected' : '' }}>{{ __('post.terlama') }}</option>
+                <option value="most_rated" {{ $sort == 'most_rated' ? 'selected' : '' }}>{{ __('post.terbanyak_rating') }}</option>
             </select>
             <div id="post-container2">
                 @foreach ($posts as $post)
@@ -98,13 +95,13 @@
                     </div>
                     <div class="user-level">
                         @if($userPost->get($post->id_user)->level == 1)
-                        Admin
+                        {{ __('post.admin') }}
                         @elseif($userPost->get($post->id_user)->level == 2)
-                        Dosen
+                        {{ __('post.dosen') }}
                         @elseif($userPost->get($post->id_user)->level == 3)
-                        Mahasiswa
+                        {{ __('post.mahasiswa') }}
                         @endif
-                        <span>{{ \Carbon\Carbon::parse($post->updated_at)->locale('id')->diffForHumans() }}</span>
+                        <span>{{ \Carbon\Carbon::parse($post->updated_at)->locale(app()->getLocale())->diffForHumans() }}</span>
                     </div>
                     <div class="post-content">{{ $post->isi_post }}</div>
                     @if ($post->file_post)
@@ -141,11 +138,11 @@
                             </button>
                             <span class="love-count" id="love-count-{{ $post->id }}">{{ $post->loves->count() }}</span>
                         </div>
-                        <div class="comment-button" onclick="showCommentForm({{ $post->id }})">Komentar</div>
+                        <div class="comment-button" onclick="showCommentForm({{ $post->id }})">{{ __('post.komentar') }}</div>
                         @if(auth()->check() && (auth()->user()->level == 1 || auth()->user()->id == $post->id_user))
-                        <div class="delete-button" onclick="deletePost({{ $post->id }})">Delete</div>
+                        <div class="delete-button" onclick="deletePost({{ $post->id }})">{{ __('post.delete') }}</div>
                         @else
-                        <div class="delete-button disabled">Delete</div>
+                        <div class="delete-button disabled">{{ __('post.delete') }}</div>
                         @endif
                     </div>
                     <div class="comment-form" id="comment-form-{{ $post->id }}">
@@ -153,7 +150,7 @@
                             @csrf
                             <input type="hidden" name="id_post" value="{{ $post->id }}">
                             <div class="comment-box">
-                                <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
+                                <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='{{ __('post.isi_post') }}'></textarea>
                                 <div class="comment-actions">
                                     <label for="file-upload-{{ $post->id }}" class="file-upload">
                                         <input type="file" id="file-upload-{{ $post->id }}" name="file_komentar[]" accept="image/*" multiple style="display: none;" onchange="previewImages2(event)">
@@ -170,9 +167,9 @@
                     @if ($komentar_parents->contains('id_post', $post->id))
                     <div class="sort-comments-container">
                         <select class="sort-comments mt-3 mb-2" id="sort-comments-{{ $post->id }}" onchange="sortComments({{ $post->id }})">
-                            <option value="newest">Terbaru</option>
-                            <option value="oldest">Terlama</option>
-                            <option value="most_rated">Terbanyak Rating</option>
+                            <option value="newest">{{ __('post.terbaru') }}</option>
+                            <option value="oldest">{{ __('post.terlama') }}</option>
+                            <option value="most_rated">{{ __('post.terbanyak_rating') }}</option>
                         </select>
                     </div>
                     @endif
@@ -198,7 +195,7 @@
                                 @elseif($user->get($komentar->id_user)->level == 3)
                                 <span>Mahasiswa</span>
                                 @endif
-                                <span>{{ \Carbon\Carbon::parse($komentar->updated_at)->locale('id')->diffForHumans() }}</span>
+                                <span>{{ \Carbon\Carbon::parse($komentar->updated_at)->locale(app()->getLocale())->diffForHumans() }}</span>
                             </div>
                             <div class="post-content">{{ $komentar->isi_komentar }}</div>
                             @if ($komentar->file_komentar)
@@ -234,11 +231,11 @@
                                     <span data-rating="{{ $i }}" class="{{ isset($ratings[$komentar->id]) && $ratings[$komentar->id]->rating >= $i ? 'selected' : '' }}">★</span>
                                     @endfor
                                 </div>
-                                <div class="comment-button" onclick="showReplyForm({{ $komentar->id }})">Balas</div>
+                                <div class="comment-button" onclick="showReplyForm({{ $komentar->id }})">{{ __('post.balas') }}</div>
                                 @if(auth()->check() && (auth()->user()->level == 1 || auth()->user()->id == $komentar->id_user))
-                                <div class="delete-button" onclick="deleteComment({{ $komentar->id }})">Delete</div>
+                                <div class="delete-button" onclick="deleteComment({{ $komentar->id }})">{{ __('post.delete') }}</div>
                                 @else
-                                <div class="delete-button disabled">Delete</div>
+                                <div class="delete-button disabled">{{ __('post.delete') }}</div>
                                 @endif
                             </div>
                             <div class="reply-form" id="reply-form-{{ $komentar->id }}">
@@ -247,13 +244,13 @@
                                     <input type="hidden" name="id_post" value="{{ $komentar->id_post }}">
                                     <input type="hidden" name="parent_id" value="{{ $komentar->id }}">
                                     <div class="comment-box">
-                                        <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
+                                        <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='{{ __('post.isi_post') }}'></textarea>
                                         <div class="comment-actions">
                                             <label for="file-upload-{{ $komentar->id }}" class="file-upload">
                                                 <input type="file" id="file-upload-{{ $komentar->id }}" name="file_komentar[]" accept="image/*" multiple style="display: none;" onchange="previewImages2(event)">
                                                 <i class="fa fa-image"></i>
                                             </label>
-                                            <button type="button" class="btn btn-info text-light" onclick="submitForm3({{ $komentar->id }},{{$post->id}})">
+                                            <button type="button" class="btn btn-info text-light" onclick="submitForm3({{ $komentar->id }},{{ $post->id }})">
                                                 <i class="fa fa-paper-plane"></i>
                                             </button>
                                         </div>
@@ -284,7 +281,7 @@
                                     @elseif($user->get($reply->id_user)->level == 3)
                                     Mahasiswa
                                     @endif
-                                    <span>{{ \Carbon\Carbon::parse($reply->updated_at)->locale('id')->diffForHumans() }}</span>
+                                    <span>{{ \Carbon\Carbon::parse($reply->updated_at)->locale(app()->getLocale())->diffForHumans() }}</span>
                                 </div>
                                 <div class="comment-content">{{ $reply->isi_komentar }}</div>
                                 @if ($reply->file_komentar)
@@ -321,16 +318,16 @@
                                         @endfor
                                     </div>
                                     @if(auth()->check() && (auth()->user()->level == 1 || auth()->user()->id == $reply->id_user))
-                                    <div class="delete-button" onclick="deleteComment({{ $reply->id }})">Delete</div>
+                                    <div class="delete-button" onclick="deleteComment({{ $reply->id }})">{{ __('post.delete') }}</div>
                                     @else
-                                    <div class="delete-button disabled">Delete</div>
+                                    <div class="delete-button disabled">{{ __('post.delete') }}</div>
                                     @endif
                                 </div>
                             </div>
                             @endforeach
                             @if(count($komentar_replies[$komentar->id]) > 1)
                             <div class="show-more" id="show-more-{{ $komentar->id }}" onclick="showMoreReplies({{ $komentar->id }})">
-                                Show more
+                                {{ __('post.show_more') }}
                             </div>
                             @endif
                         </div>
@@ -343,12 +340,13 @@
             </div>
         </div>
     </div>
+
     <div id="registerForm" class="register-form mt-5">
         <form action="{{ route('post.store') }}" method="post" enctype="multipart/form-data" id="post-form">
             @csrf
-            <h1>Buat Postingan Baru</h1>
+            <h1>{{ __('post.buat_postingan_baru') }}</h1>
             <input type="hidden" name="id_mk" value="{{ session('id_matakuliah') }}">
-            <textarea class="mb-2 mt-3" name="isi_post" placeholder='Isi Post...'></textarea>
+            <textarea class="mb-2 mt-3" name="isi_post" placeholder="{{ __('post.isi_post') }}"></textarea>
             <div class="comment-actions">
                 <label for="file-upload" class="file-upload">
                     <input type="file" id="file-upload" name="file_post[]" accept="image/*" multiple style="display: none;" onchange="previewImages(event)">
@@ -359,7 +357,7 @@
                 </button>
             </div>
             <div class="image-preview" id="image-preview"></div>
-            <button class="buttoncancel mt-3" type="button" onclick="closeRegisterForm()">Batal</button>
+            <button class="buttoncancel mt-3" type="button" onclick="closeRegisterForm()">{{ __('post.batal') }}</button>
         </form>
     </div>
     <!-- The Modal -->
@@ -469,14 +467,14 @@
 
         // ตรวจสอบว่ามีการเขียนคอมเม้นหรือไม่
         if (commentInput === '') {
-            alert('กรุณาเขียนคอมเม้น');
+            alert('Please write a comment');
             isValid = false;
         }
 
         // ตรวจสอบขนาดไฟล์
         imageFiles.forEach(file => {
             if (file.size > maxFileSize) {
-                alert('ไฟล์ขนาดใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 2 MB');
+                alert('File size is too large. Please select a file that is not larger than 2 MB');
                 isValid = false;
             }
             formData.append('file_post[]', file);
@@ -514,14 +512,14 @@
 
         // ตรวจสอบว่ามีการเขียนคอมเม้นหรือไม่
         if (commentInput === '') {
-            alert('กรุณาเขียนคอมเม้น');
+            alert('Please write a comment');
             isValid = false;
         }
 
         // ตรวจสอบขนาดไฟล์
         imageFiles.forEach(file => {
             if (file.size > maxFileSize) {
-                alert('ไฟล์ขนาดใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 2 MB');
+                alert('File size is too large. Please select a file that is not larger than 2 MB');
                 isValid = false;
             }
             formData.append('file_komentar[]', file);
@@ -557,14 +555,14 @@
 
         // ตรวจสอบว่ามีการเขียนคอมเม้นหรือไม่
         if (commentInput === '') {
-            alert('กรุณาเขียนคอมเม้น');
+            alert('Please write a comment');
             isValid = false;
         }
 
         // ตรวจสอบขนาดไฟล์
         imageFiles.forEach(file => {
             if (file.size > maxFileSize) {
-                alert('ไฟล์ขนาดใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 2 MB');
+                alert('File size is too large. Please select a file that is not larger than 2 MB');
                 isValid = false;
             }
             formData.append('file_komentar[]', file);
@@ -704,12 +702,12 @@
                 if (data.success) {
                     loadComments(data.id_post);
                 } else {
-                    alert('เกิดข้อผิดพลาดในการลบคอมเม้น: ' + data.message);
+                    alert('Error deleting comment: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('เกิดข้อผิดพลาดในการลบคอมเม้น: ' + error.message);
+                alert('Error deleting comment: ' + error.message);
             });
         }
     }
@@ -728,12 +726,13 @@
                 if (data.success) {
                     loadPosts();
                 } else {
-                    alert('เกิดข้อผิดพลาดในการลบคอมเม้น: ' + data.message);
+                    //eng alert
+                    alert('Error deleting post: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('เกิดข้อผิดพลาดในการลบคอมเม้น: ' + error.message);
+                alert('Error deleting post: ' + error.message);
             });
         }
     }

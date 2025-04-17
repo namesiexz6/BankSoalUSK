@@ -13,13 +13,13 @@
             </div>
             <div class="user-level">
                 @if($user->get($komentar->id_user)->level == 1)
-                    <span>Admin</span>
+                    <span>{{ __('post.admin') }}</span>
                 @elseif($user->get($komentar->id_user)->level == 2)
-                    <span>Dosen</span>
+                    <span>{{ __('post.dosen') }}</span>
                 @elseif($user->get($komentar->id_user)->level == 3)
-                    <span>Mahasiswa</span>
+                    <span>{{ __('post.mahasiswa') }}</span>
                 @endif
-                <span>{{ \Carbon\Carbon::parse($komentar->updated_at)->locale('id')->diffForHumans() }}</span>
+                <span>{{ \Carbon\Carbon::parse($komentar->updated_at)->locale(app()->getLocale())->diffForHumans() }}</span>
             </div>
             <div class="post-content">{{ $komentar->isi_komentar }}</div>
             @if ($komentar->file_komentar)
@@ -62,11 +62,11 @@
                             class="{{ isset($ratings[$komentar->id]) && $ratings[$komentar->id]->rating >= $i ? 'selected' : '' }}">★</span>
                     @endfor
                 </div>
-                <div class="comment-button" onclick="showReplyForm({{ $komentar->id }})">Balas</div>
+                <div class="comment-button" onclick="showReplyForm({{ $komentar->id }})">{{ __('post.balas') }}</div>
                 @if(auth()->check() && (auth()->user()->level == 1 || auth()->user()->id == $komentar->id_user))
-                    <div class="delete-button" onclick="deleteComment({{ $komentar->id }})">Delete</div>
+                    <div class="delete-button" onclick="deleteComment({{ $komentar->id }})">{{ __('post.delete') }}</div>
                 @else
-                    <div class="delete-button disabled">Delete</div>
+                    <div class="delete-button disabled">{{ __('post.delete') }}</div>
                 @endif
             </div>
 
@@ -77,7 +77,7 @@
                     <input type="hidden" name="id_post" value="{{ $komentar->id_post }}">
                     <input type="hidden" name="parent_id" value="{{ $komentar->id }}">
                     <div class="comment-box">
-                        <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
+                        <textarea class="mb-2 mt-3" name="isi_komentar" placeholder="{{ __('post.isi_komentar') }}"></textarea>
                         <div class="comment-actions">
                             <label for="file-upload-{{ $komentar->id }}" class="file-upload">
                                 <input type="file" id="file-upload-{{ $komentar->id }}" name="file_komentar[]" accept="image/*"
@@ -109,13 +109,13 @@
                         </div>
                         <div class="user-level">
                             @if($user->get($reply->id_user)->level == 1)
-                                Admin
+                                {{ __('post.admin') }}
                             @elseif($user->get($reply->id_user)->level == 2)
-                                Dosen
+                                {{ __('post.dosen') }}
                             @elseif($user->get($reply->id_user)->level == 3)
-                                Mahasiswa
+                                {{ __('post.mahasiswa') }}
                             @endif
-                            <span>{{ \Carbon\Carbon::parse($reply->updated_at)->locale('id')->diffForHumans() }}</span>
+                            <span>{{ \Carbon\Carbon::parse($reply->updated_at)->locale(app()->getLocale())->diffForHumans() }}</span>
                         </div>
                         <div class="comment-content">{{ $reply->isi_komentar }}</div>
                         @if ($reply->file_komentar)
@@ -159,16 +159,16 @@
                                 @endfor
                             </div>
                             @if(auth()->check() && (auth()->user()->level == 1 || auth()->user()->id == $reply->id_user))
-                                <div class="delete-button" onclick="deleteComment({{ $reply->id }})">Delete</div>
+                                <div class="delete-button" onclick="deleteComment({{ $reply->id }})">{{ __('post.delete') }}</div>
                             @else
-                                <div class="delete-button disabled">Delete</div>
+                                <div class="delete-button disabled">{{ __('post.delete') }}</div>
                             @endif
                         </div>
                     </div>
                 @endforeach
-                @if (count($komentar_replies[$komentar->id]) > 1)
+                @if(count($komentar_replies[$komentar->id]) > 1)
                     <div id="show-more-{{ $komentar->id }}" class="show-more" onclick="showMoreReplies({{ $komentar->id }})">
-                        Show more
+                        {{ __('post.show_more') }}
                     </div>
                 @endif
             </div>

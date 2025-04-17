@@ -8,6 +8,14 @@ use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NotificationController;
 
+Route::get('/lang/{lang}', function ($lang) {
+    if (in_array($lang, ['en', 'id'])) {  // ตรวจสอบภาษาที่รองรับ
+        session(['locale' => $lang]);  // เก็บภาษาที่เลือกใน session
+    }
+    return redirect()->back();  // กลับไปยังหน้าเดิม
+});
+
+
 Route::get("/", function () {
     return view("homepage");
 });

@@ -2,17 +2,18 @@
 @section('body')
 <div class="background"
     style="background-image: url('{{  asset('background.png') }}'); background-size: cover; background-position: center; height: 32vh;">
-    <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">Pilih Kriteria untuk Mencari
-        Soal</h2>
+    <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;" id="judul">
+        {{ __('soal.judul') }}
+    </h2>
     <div class="container mt-3">
 
         <div class="row">
             <div class="col-md-3">
-                <form id="semesterForm" >
+                <form id="semesterForm">
                     @csrf
-                    <label for="jenjang" class="form-label mt-3" style="color: white;">Jenjang:</label>
+                    <label for="jenjang" class="form-label mt-3" style="color: white;" data-translate="soal.jenjang">{{ __('soal.jenjang') }}:</label>
                     <select class="form-control" aria-label="Default select" name="jenjang" id="jenjang">
-                        <option value="">-- Pilih Janjang --</option>
+                        <option value="">{{ __('soal.pilih_jenjang') }}</option>
                         @foreach ($jenjang as $jj)
                         <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>
                             {{ $jj->nama }}
@@ -21,10 +22,10 @@
                     </select>
             </div>
             <div class="col-md-3">
-                <label for="fakultas" class="form-label mt-3" style="color: white;">Fakultas:</label>
+                <label for="fakultas" class="form-label mt-3" style="color: white;" data-translate="soal.fakultas">{{ __('soal.fakultas') }}:</label>
                 <select class="form-control" aria-label="Default select" name="fakultas" id="fakultas"
                     {{ !session('jenjang') ? 'disabled' : '' }}>
-                    <option value="">-- Pilih Fakultas --</option>
+                    <option value="">{{ __('soal.pilih_fakultas') }}</option>
                     @foreach ($fakultas as $f)
                     <option value="{{ $f->id }}" {{ session('fakultas') == $f->id ? 'selected' : '' }}>{{ $f->nama }}
                     </option>
@@ -32,10 +33,10 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="prodi" class="form-label mt-3" style="color: white;">Prodi:</label>
+                <label for="prodi" class="form-label mt-3" style="color: white;" data-translate="soal.prodi">{{ __('soal.prodi') }}:</label>
                 <select class="form-control" aria-label="Default select" name="prodi" id="prodi"
                     {{ !session('fakultas') ? 'disabled' : '' }}>
-                    <option value="">-- Pilih Prodi --</option>
+                    <option value="">{{ __('soal.pilih_prodi') }}</option>
                     @foreach ($prodi as $p)
                     <option value="{{ $p->id }}" {{ session('prodi') == $p->id ? 'selected' : '' }}>{{ $p->nama }}
                     </option>
@@ -43,10 +44,10 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="semester" class="form-label mt-3" style="color: white;">Semester:</label>
+                <label for="semester" class="form-label mt-3" style="color: white;" data-translate="soal.semester">{{ __('soal.semester') }}:</label>
                 <select class="form-control" aria-label="Default select" name="semester" id="semester"
                     {{ !session('prodi') ? 'disabled' : '' }}>
-                    <option value="">-- Pilih Semester --</option>
+                    <option value="">{{ __('soal.pilih_semester') }}</option>
                     @foreach ($semester as $s)
                     <option value="{{ $s->id }}" {{ session('semester') == $s->id ? 'selected' : '' }}>{{ $s->nama }}
                     </option>
@@ -65,7 +66,6 @@
 </div>
 </div>
 </div>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 $(document).ready(function() {
@@ -88,7 +88,7 @@ $(document).ready(function() {
                 },
                 dataType: 'json',
                 success: function(result) {
-                    fakultas.empty().append('<option value="">-Semua-</option>');
+                    fakultas.empty().append('<option value="">{{ __('soal.pilih_fakultas') }}</option>');
                     $.each(result.fakultas, function(key, value) {
                         fakultas.append('<option value="' + value.id + '">' + value
                             .nama + '</option>');
@@ -120,7 +120,7 @@ $(document).ready(function() {
                 },
                 dataType: 'json',
                 success: function(result) {
-                    prodi.empty().append('<option value="">-Semua-</option>');
+                    prodi.empty().append('<option value="">{{ __('soal.pilih_prodi') }}</option>');
                     $.each(result.prodi, function(key, value) {
                         prodi.append('<option value="' + value.id + '">' + value
                             .nama + '</option>');
@@ -150,7 +150,7 @@ $(document).ready(function() {
                 },
                 dataType: 'json',
                 success: function(result) {
-                    semester.empty().append('<option value="">-Semua-</option>');
+                    semester.empty().append('<option value="">{{ __('soal.pilih_semester') }}</option>');
                     $.each(result.semester, function(key, value) {
                         semester.append('<option value="' + value.id + '">' + value
                             .nama + '</option>');
@@ -190,4 +190,5 @@ $(document).ready(function() {
     });
 });
 </script>
+
 @endsection

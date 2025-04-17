@@ -50,8 +50,8 @@
             @csrf
             <input type="hidden" name="id_soal" value="{{ $soals->id }}">
             <div class="comment-box">
-                <h2>Komentar</h2>
-                <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
+                <h2>{{ __('soal.komentar') }}</h2>
+                <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='{{ __('soal.komentar_placeholder') }}'></textarea>
                 <div class="comment-actions">
                     <label for="file-upload" class="file-upload">
                         <input type="file" id="file-upload" name="file_komentar[]" accept="image/*" multiple
@@ -66,9 +66,9 @@
             </div>
         </form>
         <select class="sort-comments mt-3 mb-2" id="sort-comments" onchange="sortComments()">
-            <option value="newest" {{ $sort == 'newest' ? 'selected' : '' }}>Terbaru</option>
-            <option value="oldest" {{ $sort == 'oldest' ? 'selected' : '' }}>Terlama</option>
-            <option value="most_rated" {{ $sort == 'most_rated' ? 'selected' : '' }}>Terbanyak Rating</option>
+            <option value="newest" {{ $sort == 'newest' ? 'selected' : '' }}>{{ __('soal.terbaru') }}</option>
+            <option value="oldest" {{ $sort == 'oldest' ? 'selected' : '' }}>{{ __('soal.terlama') }}</option>
+            <option value="most_rated" {{ $sort == 'most_rated' ? 'selected' : '' }}>{{ __('soal.terbanyak_rating') }}</option>
         </select>
         <div id="comments-container">
             @foreach ($komentar_parents as $komentar)
@@ -85,13 +85,13 @@
                         </div>
                         <div class="user-level">
                             @if($user->get($komentar->id_user)->level == 1)
-                                <span>Admin</span>
+                                <span>{{ __('soal.admin') }}</span>
                             @elseif($user->get($komentar->id_user)->level == 2)
-                                <span>Dosen</span>
+                                <span>{{ __('soal.dosen') }}</span>
                             @elseif($user->get($komentar->id_user)->level == 3)
-                                <span>Mahasiswa</span>
+                                <span>{{ __('soal.mahasiswa') }}</span>
                             @endif
-                            <span>{{ \Carbon\Carbon::parse($komentar->updated_at)->locale('id')->diffForHumans() }}</span>
+                            <span>{{ \Carbon\Carbon::parse($komentar->updated_at)->locale(app()->getLocale())->diffForHumans() }}</span>
                         </div>
                         <div class="post-content">{{ $komentar->isi_komentar }}</div>
                         @if ($komentar->file_komentar)
@@ -128,14 +128,15 @@
                         <div class="post-footer">
                             <div class="rating" data-komentar-id="{{ $komentar->id }}">
                                 @for ($i = 1; $i <= 5; $i++) <span data-rating="{{ $i }}"
+
                                     class="{{ isset($ratings[$komentar->id]) && $ratings[$komentar->id]->rating >= $i ? 'selected' : '' }}">★</span>
                                 @endfor
                             </div>
-                            <div class="comment-button" onclick="showReplyForm({{ $komentar->id }})">Balas</div>
+                            <div class="comment-button" onclick="showReplyForm({{ $komentar->id }})">{{ __('soal.balas') }}</div>
                             @if(auth()->check() && auth()->user()->level == 1 || auth()->user()->id == $komentar->id_user)
-                                <div class="delete-button" onclick="deleteComment({{ $komentar->id }})">Delete</div>
+                                <div class="delete-button" onclick="deleteComment({{ $komentar->id }})">{{ __('soal.delete') }}</div>
                             @else
-                                <div class="delete-button disabled">Delete</div>
+                                <div class="delete-button disabled">{{ __('soal.delete') }}</div>
                             @endif
                         </div>
                         <div class="reply-form" id="reply-form-{{ $komentar->id }}">
@@ -145,7 +146,7 @@
                                 <input type="hidden" name="id_soal" value="{{ $soals->id }}">
                                 <input type="hidden" name="parent_id" value="{{ $komentar->id }}">
                                 <div class="comment-box">
-                                    <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='Isi Komentar...'></textarea>
+                                    <textarea class="mb-2 mt-3" name="isi_komentar" placeholder='{{ __('soal.komentar_placeholder') }}'></textarea>
                                     <div class="comment-actions">
                                         <label for="file-upload-{{ $komentar->id }}" class="file-upload">
                                             <input type="file" id="file-upload-{{ $komentar->id }}" name="file_komentar[]"
@@ -179,13 +180,13 @@
                                     </div>
                                     <div class="user-level">
                                         @if($user->get($reply->id_user)->level == 1)
-                                            Admin
+                                            {{ __('soal.admin') }}
                                         @elseif($user->get($reply->id_user)->level == 2)
-                                            Dosen
+                                            {{ __('soal.dosen') }}
                                         @elseif($user->get($reply->id_user)->level == 3)
-                                            Mahasiswa
+                                            {{ __('soal.mahasiswa') }}
                                         @endif
-                                        <span>{{ \Carbon\Carbon::parse($reply->updated_at)->locale('id')->diffForHumans() }}</span>
+                                        <span>{{ \Carbon\Carbon::parse($reply->updated_at)->locale(app()->getLocale())->diffForHumans() }}</span>
                                     </div>
                                     <div class="comment-content">{{ $reply->isi_komentar }}</div>
                                     @if ($reply->file_komentar)
@@ -222,13 +223,14 @@
                                     <div class="comment-footer">
                                         <div class="rating" data-komentar-id="{{ $reply->id }}">
                                             @for ($i = 1; $i <= 5; $i++) <span data-rating="{{ $i }}"
+
                                                 class="{{ isset($ratings[$reply->id]) && $ratings[$reply->id]->rating >= $i ? 'selected' : '' }}">★</span>
                                             @endfor
                                         </div>
                                         @if(auth()->check() && (auth()->user()->level == 1 || auth()->user()->id == $reply->id_user))
-                                            <div class="delete-button" onclick="deleteComment({{ $reply->id }})">Delete</div>
+                                            <div class="delete-button" onclick="deleteComment({{ $reply->id }})">{{ __('soal.delete') }}</div>
                                         @else
-                                            <div class="delete-button disabled">Delete</div>
+                                            <div class="delete-button disabled">{{ __('soal.delete') }}</div>
                                         @endif
                                     </div>
                                 </div>
@@ -338,14 +340,14 @@
 
         // ตรวจสอบว่ามีการเขียนคอมเม้นหรือไม่
         if (commentInput === '') {
-            alert('กรุณาเขียนคอมเม้น');
+            alert('Please write a comment');
             isValid = false;
         }
 
         // ตรวจสอบขนาดไฟล์
         imageFiles.forEach(file => {
             if (file.size > maxFileSize) {
-                alert('ไฟล์ขนาดใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 2 MB');
+                alert('File size is too large, please select a file less than 2 MB');
                 isValid = false;
             }
             formData.append('file_komentar[]', file);
@@ -381,14 +383,14 @@
 
         // ตรวจสอบว่ามีการเขียนคอมเม้นหรือไม่
         if (commentInput === '') {
-            alert('กรุณาเขียนคอมเม้น');
+            alert('Please write a comment');
             isValid = false;
         }
 
         // ตรวจสอบขนาดไฟล์
         imageFiles.forEach(file => {
             if (file.size > maxFileSize) {
-                alert('ไฟล์ขนาดใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 2 MB');
+                alert('FIle size is too large, please select a file less than 2 MB');
                 isValid = false;
             }
             formData.append('file_komentar[]', file);
@@ -556,7 +558,7 @@
     }
 
     function deleteComment(commentId) {
-        if (confirm('คุณต้องการลบคอมเม้นนี้หรือไม่?')) {
+        if (confirm('Do you want to delete this comment?')) {
             fetch(`/komentar/${commentId}`, {
                 method: 'DELETE',
                 headers: {
@@ -574,12 +576,14 @@
                     if (data.success) {
                         loadComments();
                     } else {
-                        alert('เกิดข้อผิดพลาดในการลบคอมเม้น: ' + data.message);
+                        alert('Error deleting comment: ' + data.message);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('เกิดข้อผิดพลาดในการลบคอมเม้น: ' + error.message);
+                 
+                    alert('Error deleting comment: ' + error.message);
+                    
                 });
         }
     }

@@ -1,4 +1,4 @@
-@extends('management/management')
+@extends('management/management') 
 @section('content')
 
 <head>
@@ -21,7 +21,7 @@
 <div style="margin-left:15%">
 <div class="background"
   style="background-image: url('{{  asset('background.png') }}'); background-size: cover; background-position: top; height: 10vh; display: flex; align-items: center; justify-content: center;">
-  <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">Manajemen Soal</h2>
+  <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">{{ __('management.manajemen_soal') }}</h2>
 </div>
 
     <div class="w3-container">
@@ -31,9 +31,9 @@
                 <div class="row">
 
                     <div class="col-md-3">
-                        <label for="jenjang" class="form-label mt-3">Pilih Jenjang:</label>
+                        <label for="jenjang" class="form-label mt-3">{{ __('management.pilih_jenjang') }}</label>
                         <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang">
-                            <option value="">-- Pilih Jenjang --</option>
+                            <option value="">-- {{ __('management.pilih_jenjang') }} --</option>
                             @foreach ($jenjang as $jj)
                             <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>{{ $jj->nama }}</option>
                             @endforeach
@@ -41,9 +41,9 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label for="fakultas" class="form-label mt-3">Pilih Fakultas:</label>
+                        <label for="fakultas" class="form-label mt-3">{{ __('management.pilih_fakultas') }}</label>
                         <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" {{ !session('jenjang') ? 'disabled' : '' }}>
-                            <option value="">-- Pilih Fakultas --</option>
+                            <option value="">-- {{ __('management.pilih_fakultas') }} --</option>
                             @foreach ($fakultas as $f)
                             <option value="{{ $f->id }}" {{ session('fakultas') == $f->id ? 'selected' : '' }}>{{ $f->nama }}</option>
                             @endforeach
@@ -51,9 +51,9 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label for="prodi" class="form-label mt-3">Pilih Prodi:</label>
+                        <label for="prodi" class="form-label mt-3">{{ __('management.pilih_prodi') }}</label>
                         <select class="form-select" aria-label="Default select" name="prodi" id="prodi" {{ !session('fakultas') ? 'disabled' : '' }}>
-                            <option value="">-- Pilih Prodi --</option>
+                            <option value="">-- {{ __('management.pilih_prodi') }} --</option>
                             @foreach ($prodi as $p)
                             <option value="{{ $p->id }}" {{ session('prodi') == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
                             @endforeach
@@ -61,9 +61,9 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label for="semester" class="form-label mt-3">Pilih Semester:</label>
+                        <label for="semester" class="form-label mt-3">{{ __('management.pilih_semester') }}</label>
                         <select class="form-select" aria-label="Default select" name="semester" id="semester" {{ !session('prodi') ? 'disabled' : '' }}>
-                            <option value="">-- Pilih Semester --</option>
+                            <option value="">-- {{ __('management.pilih_semester') }} --</option>
                             @foreach ($semester as $s)
                             <option value="{{ $s->id }}" {{ session('semester') == $s->id ? 'selected' : '' }}>{{ $s->nama }}</option>
                             @endforeach
@@ -71,9 +71,9 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label for="matakuliah" class="form-label mt-3">Pilih Matakuliah:</label>
+                        <label for="matakuliah" class="form-label mt-3">{{ __('management.pilih_matakuliah') }}</label>
                         <select class="form-select" aria-label="Default select" name="matakuliah" id="matakuliah" {{ !session('prodi') ? 'disabled' : '' }}>
-                            <option disabled selected value="">-- Pilih Matakuliah --</option>
+                            <option disabled selected value="">-- {{ __('management.pilih_matakuliah') }} --</option>
                             @foreach ($matakuliah as $m)
                             <option value="{{ $m->id }}" {{ session('matakuliah') == $m->id ? 'selected' : '' }}>{{ $m->nama }}</option>
                             @endforeach
@@ -87,10 +87,10 @@
 
     <div style="margin-left:10px; margin-right:10px;">
         <div id="soalContainer">
-            <!-- เนื้อหาของ soal จะถูกอัพเดตที่นี่ -->
+            <!-- Content of soal will be updated here -->
         </div>
 
-        <button class="buttonadd mt-3" type="button" onclick="window.location.href='/addSoal'">Tambah soal</button>
+        <button class="buttonadd mt-3" type="button" onclick="window.location.href='/addSoal'">{{ __('management.tambah_soal') }}</button>
     </div>
 </div>
 
@@ -118,7 +118,7 @@
                     },
                     dataType: 'json',
                     success: function(result) {
-                        fakultas.empty().append('<option value="">-- Pilih Fakultas --</option>');
+                        fakultas.empty().append('<option value="">-- {{ __('management.pilih_fakultas') }} --</option>');
                         $.each(result.fakultas, function(key, value) {
                             fakultas.append('<option value="' + value.id + '">' + value.nama + '</option>');
                         });
@@ -151,7 +151,7 @@
                     },
                     dataType: 'json',
                     success: function(result) {
-                        prodi.empty().append('<option value="">-- Pilih Prodi --</option>');
+                        prodi.empty().append('<option value="">-- {{ __('management.pilih_prodi') }} --</option>');
                         $.each(result.prodi, function(key, value) {
                             prodi.append('<option value="' + value.id + '">' + value.nama + '</option>');
                         });
@@ -182,7 +182,7 @@
                     },
                     dataType: 'json',
                     success: function(result) {
-                        semester.empty().append('<option value="">-- Pilih Semester --</option>');
+                        semester.empty().append('<option value="">-- {{ __('management.pilih_semester') }} --</option>');
                         $.each(result.semester, function(key, value) {
                             semester.append('<option value="' + value.id + '">' + value.nama + '</option>');
                         });
@@ -211,7 +211,7 @@
                     },
                     dataType: 'json',
                     success: function(result) {
-                        matakuliah.empty().append('<option value="">-- Pilih Matakuliah --</option>');
+                        matakuliah.empty().append('<option value="">-- {{ __('management.pilih_matakuliah') }} --</option>');
                         $.each(result.matakuliah, function(key, value) {
                             matakuliah.append('<option value="' + value.id + '">' + value.nama + '</option>');
                         });

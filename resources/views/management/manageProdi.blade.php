@@ -9,7 +9,6 @@
             font-weight: 500;
             font-family: Montserrat, sans-serif;
         }
-
         h2 {
             font-size: 25px;
             font-weight: 500;
@@ -21,7 +20,7 @@
 
 <div class="background"
   style="background-image: url('{{  asset('background.png') }}'); background-size: cover; background-position: top; height: 10vh; display: flex; align-items: center; justify-content: center;">
-  <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">Manajemen Prodi</h2>
+  <h2 style="color: white; text-align: center; margin-bottom: 25px; margin-top: 28px;">{{ __('management.manajemen_prodi') }}</h2>
 </div>
 
     <div class="w3-container">
@@ -30,9 +29,9 @@
                 @csrf
                 <div class="row">
                     <div class="col-md-3">
-                        <label for="jenjang" class="form-label mt-3">Pilih Jenjang:</label>
+                        <label for="jenjang" class="form-label mt-3">{{ __('management.pilih_jenjang') }}:</label>
                         <select class="form-select" aria-label="Default select" name="jenjang" id="jenjang">
-                            <option value="">-- Pilih Jenjang --</option>
+                            <option value="">-- {{ __('management.pilih_jenjang') }} --</option>
                             @foreach ($jenjang as $jj)
                                 <option value="{{ $jj->id }}" {{ session('jenjang') == $jj->id ? 'selected' : '' }}>
                                     {{ $jj->nama }}</option>
@@ -40,9 +39,9 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="fakultas" class="form-label mt-3">Pilih Fakultas:</label>
+                        <label for="fakultas" class="form-label mt-3">{{ __('management.pilih_fakultas') }}:</label>
                         <select class="form-select" aria-label="Default select" name="fakultas" id="fakultas" {{ !session('jenjang') ? 'disabled' : '' }}>
-                            <option disabled selected value="">-- Pilih Fakultas --</option>
+                            <option disabled selected value="">-- {{ __('management.pilih_fakultas') }} --</option>
                             @foreach ($fakultas as $f)
                                 <option value="{{ $f->id }}" {{ session('fakultas') == $f->id ? 'selected' : '' }}>
                                     {{ $f->nama }}</option>
@@ -53,35 +52,37 @@
             </form>
         </div>
     </div>
+
+
     <div style="margin-left:10px; margin-right:10px;">
         <div id="prodiContainer">
             <!-- เนื้อหาของ prodi จะถูกอัพเดตที่นี่ -->
         </div>
 
-        <button class="buttonadd mt-3" type="button" id="adressBTN" onclick="openRegisterForm()">Tambah Prodi</button>
+        <button class="buttonadd mt-3" type="button" id="adressBTN" onclick="openRegisterForm()">{{ __('management.tambah_prodi') }}</button>
     </div>
 
     <div id="registerForm" class="register-form">
         <form action="{{ route('tambahProdiM') }}" method="post" enctype="multipart/form-data">
             @csrf
-            <h1>Tambah Prodi</h1>
-            <label class="form-label mt-3">Nama Prodi:</label>
+            <h1>{{ __('management.tambah_prodi') }}</h1>
+            <label class="form-label mt-3">{{ __('management.nama_prodi') }}:</label>
             <input class="form-control" name="nama_prodi" id="nama_prodi" type="text" placeholder="ex: Informatika" required>
-            <label class="form-label mt-3">Pilih alamat:</label><br>
+            <label class="form-label mt-3">{{ __('management.pilih_alamat') }}:</label><br>
             <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang2">
-                <option value="">-- Pilih Janjang --</option>
+                <option value="">-- {{ __('management.pilih_jenjang') }} --</option>
                 @foreach ($jenjang as $jj)
                     <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
                 @endforeach
             </select>
             <select class="form-control" aria-label="Default select" name="fakultas2" id="fakultas2" required>
-                <option value="">-- Pilih Fakultas --</option>
+                <option value="">-- {{ __('management.pilih_fakultas') }} --</option>
                 @foreach ($fakultas as $f)
                     <option value="{{ $f->id }}">{{ $f->nama }}</option>
                 @endforeach
             </select>
-            <button type="submit" class="registerbtn">Submit</button>
-            <button class="buttoncancel mt-3" type="button" id="adressBTN" onclick="closeRegisterForm()">Batal</button>
+            <button type="submit" class="registerbtn">{{ __('management.submit') }}</button>
+            <button class="buttoncancel mt-3" type="button" id="adressBTN" onclick="closeRegisterForm()">{{ __('management.batal') }}</button>
         </form>
     </div>
 
@@ -89,27 +90,28 @@
         <form action="{{ route('prodiM') }}" method="post" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="edit" value="1">
-            <h1>Edit Prodi</h1>
-            <label class="form-label mt-3">Nama Prodi:</label>
+            <h1>{{ __('management.edit') }} {{ __('management.nama_prodi') }}</h1>
+            <label class="form-label mt-3">{{ __('management.nama_prodi') }}:</label>
             <input type="hidden" name="prodi_id" id="prodi_id" value="">
             <input class="form-control" name="nama_prodi" id="nama_prodi" type="text" value="" required>
-            <label class="form-label mt-3">Pilih alamat:</label><br>
+            <label class="form-label mt-3">{{ __('management.pilih_alamat') }}:</label><br>
             <select class="form-control" aria-label="Default select" name="jenjang2" id="jenjang3">
-                <option value="">-- Pilih Janjang --</option>
+                <option value="">-- {{ __('management.pilih_jenjang') }} --</option>
                 @foreach ($jenjang as $jj)
                     <option value="{{ $jj->id }}">{{ $jj->nama }}</option>
                 @endforeach
             </select>
             <select class="form-control" aria-label="Default select" name="fakultas2" id="fakultas3" required>
-                <option value="">-- Pilih Fakultas --</option>
+                <option value="">-- {{ __('management.pilih_fakultas') }} --</option>
                 @foreach ($fakultas as $f)
                     <option value="{{ $f->id }}">{{ $f->nama }}</option>
                 @endforeach
             </select>
-            <button type="submit" class="registerbtn">Submit</button>
-            <button class="buttoncancel mt-3" type="button" id="adressBTN" onclick="closeRegisterFormEdit()">Batal</button>
+            <button type="submit" class="registerbtn">{{ __('management.submit') }}</button>
+            <button class="buttoncancel mt-3" type="button" id="adressBTN" onclick="closeRegisterFormEdit()">{{ __('management.batal') }}</button>
         </form>
     </div>
+
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -133,7 +135,7 @@
                     },
                     dataType: 'json',
                     success: function(result) {
-                        fakultas.empty().append('<option value="">-- Pilih Fakultas --</option>');
+                        fakultas.empty().append('<option value="">-- {{ __('management.pilih_fakultas') }} --</option>');
                         $.each(result.fakultas, function(key, value) {
                             fakultas.append('<option value="' + value.id + '">' + value.nama + '</option>');
                         });
@@ -209,7 +211,7 @@
                 },
                 dataType: 'json',
                 success: function(result) {
-                    $('#fakultas2').html('<option value="">-- Pilih Fakultas --</option>');
+                    $('#fakultas2').html('<option value="">-- {{ __('management.pilih_fakultas') }} --</option>');
                     console.log(result);
                     $.each(result.fakultas, function(key, value) {
                         $("#fakultas2").append('<option value="' + value.id + '">' + value.nama + '</option>');
@@ -233,7 +235,7 @@
                 },
                 dataType: 'json',
                 success: function(result) {
-                    $('#fakultas3').html('<option value="">-- Pilih Fakultas --</option>');
+                    $('#fakultas3').html('<option value="">-- {{ __('management.pilih_fakultas') }} --</option>');
                     console.log(result);
                     $.each(result.fakultas, function(key, value) {
                         $("#fakultas3").append('<option value="' + value.id + '">' + value.nama + '</option>');
