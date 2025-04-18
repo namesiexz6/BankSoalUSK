@@ -10,23 +10,28 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev \
     libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl bcmath gd
 
 # ติดตั้ง Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# ไปที่โฟลเดอร์แอป
+# ตั้ง working directory
 WORKDIR /var/www
 
-# คัดลอกโปรเจกต์ลงใน container
+# คัดลอกไฟล์ทั้งหมดไปยัง container
 COPY . .
 
-# ติดตั้ง Laravel
+# ติดตั้ง dependencies ของ Laravel
 RUN composer install --optimize-autoloader --no-dev
+
+# ให้สิทธิ์ storage และ bootstrap/cache
 RUN chmod -R 777 storage bootstrap/cache
 
-# รัน Laravel Server
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
-
-
+# เปิดพอร์ต 8000
 EXPOSE 8000
+
+# คำสั่งเริ่มต้น: migrate และรัน Laravel server
+CMD php artisan key:generate --force && \
+    php artisan migrate --force && \
+    php artisan storage:link && \
+    php artisan serve --host=0.0.0.0 --port=8000
