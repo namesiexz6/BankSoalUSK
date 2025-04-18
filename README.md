@@ -39,3 +39,9 @@
 ---
 
 หากมีปัญหาในการใช้งาน สามารถแจ้งรายละเอียด error เพื่อขอคำแนะนำเพิ่มเติมได้
+
+![image](https://github.com/user-attachments/assets/0993e31b-9da6-4c32-9550-b1c433718cf6)
+
+![image](https://github.com/user-attachments/assets/ee3cc40b-35d3-4a35-90c5-78430f019432)
+
+
