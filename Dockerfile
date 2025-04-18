@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev \
     libpq-dev \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl bcmath gd
+    libgmp-dev \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl bcmath gd gmp
 
 # ติดตั้ง Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -32,6 +33,6 @@ EXPOSE 8000
 
 # คำสั่งเริ่มต้น: migrate และรัน Laravel server
 CMD php artisan key:generate --force && \
-    php artisan migrate --force && \
+    php artisan migrate --force --seed && \
     php artisan storage:link && \
     php artisan serve --host=0.0.0.0 --port=8000

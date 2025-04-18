@@ -189,11 +189,11 @@
                             </div>
                             <div class="user-level">
                                 @if($user->get($komentar->id_user)->level == 1)
-                                <span>Admin</span>
+                                <span>{{ __('post.admin') }}</span>
                                 @elseif($user->get($komentar->id_user)->level == 2)
-                                <span>Dosen</span>
+                                <span>{{ __('post.dosen') }}</span>
                                 @elseif($user->get($komentar->id_user)->level == 3)
-                                <span>Mahasiswa</span>
+                                <span>{{ __('post.mahasiswa') }}</span>
                                 @endif
                                 <span>{{ \Carbon\Carbon::parse($komentar->updated_at)->locale(app()->getLocale())->diffForHumans() }}</span>
                             </div>
@@ -275,11 +275,11 @@
                                 </div>
                                 <div class="user-level">
                                     @if($user->get($reply->id_user)->level == 1)
-                                    Admin
+                                    {{ __('post.admin') }}
                                     @elseif($user->get($reply->id_user)->level == 2)
-                                    Dosen
+                                    {{ __('post.dosen') }}
                                     @elseif($user->get($reply->id_user)->level == 3)
-                                    Mahasiswa
+                                    {{ __('post.mahasiwa') }}
                                     @endif
                                     <span>{{ \Carbon\Carbon::parse($reply->updated_at)->locale(app()->getLocale())->diffForHumans() }}</span>
                                 </div>

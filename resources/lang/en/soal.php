@@ -20,11 +20,11 @@ return [
     'tidak_ada_mata_kuliah' => 'No available courses.',
     'mata_kuliah' => 'Course',
     'daftar_soal' => 'Question List',
-    'thread' => 'Thread',
+    'thread' => 'comunity',
     'nama_soal' => 'Question Name',  
     'dibuat_oleh' => 'Created By',   
     'update' => 'Update',    
-    'tidak_ada_soal' => 'No questions available.',
+    'tidak_ada_soal' => 'There are no questions yet. Please stay tuned for updates!',
     'komentar' => 'Comment',
     'terbaru' => 'Newest',
     'terlama' => 'Oldest',
@@ -36,6 +36,7 @@ return [
     'admin' => 'Admin',
     'dosen' => 'Lecturer',
     'mahasiswa' => 'Student',
+
  
     
     
