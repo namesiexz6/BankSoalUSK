@@ -26,6 +26,11 @@
    ```
    http://localhost:8000
    ```
+   
+6. **Register new account for test this aplication**
+   ```
+   http://localhost:8000/register
+   ```
 
 ---
 
