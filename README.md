@@ -7,7 +7,7 @@
 
 2. **Clone โปรเจกต์นี้จาก GitHub**
    ```sh
-   git clone <repo-url>
+   git clone https://github.com/namesiexz6/BankSoalUSK.git
    cd BankSoalUSK
    ```
 
